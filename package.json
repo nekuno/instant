@@ -1,0 +1,8 @@
+{
+  "name" : "qnoow-chat",
+  "version" : "0.0.1",
+  "dependencies" : {
+    "socket.io" : "0.9.x",
+    "validate" : "2.1.2"
+  }
+}
