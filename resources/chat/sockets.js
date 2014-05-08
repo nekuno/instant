@@ -1,8 +1,7 @@
-var	validator = require('validator');
-
 module.exports = {
-	start: function (server) {
-		var io = require('socket.io').listen(server);
+	start: function (container) {
+		var io = container['io'];
+		var validator = container['validator'];
 
 		var users = {};
 		var listeners = {};
@@ -48,7 +47,7 @@ module.exports = {
 		            console.log('l'+listener);
 		            io.sockets.socket(users[listener]['socket']).emit('user_status', socket.user, 'offline');
 		        }
-		        //delete users and his listenings
+		        //delete users and his suscriptions
 		        if (users[socket.user]) {
 		            for (var i in users[socket.user]['listening']) {
 		                listening = users[socket.user]['listening'][i];
