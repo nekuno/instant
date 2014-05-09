@@ -1,14 +1,17 @@
 //Bootstraping
 var config = require('./config/config.js');
 
-var mysql      = require('mysql');
-var connection = mysql.createConnection({
+var bookshelf  = require('bookshelf');
+bookshelf.database = bookshelf.initialize({
+  client: 'mysql',
+  connection: {
     host     : config.mysql.host,
-    database : config.mysql.database,
     user     : config.mysql.user,
-    password : config.mysql.password
+    password : config.mysql.password,
+    database : config.mysql.database,
+    charset  : 'UTF8_GENERAL_CI'
+  }
 });
-connection.connect();
 
 var server = require('http').createServer();
 server.listen(config.server.port);
@@ -20,12 +23,13 @@ var	validator = require('validator');
 //Container
 container = {
 	'server' : server,
-	'mysql' : mysql,
+	'database' : bookshelf.database,
 	'io' : io,
 	'validator' : validator
 }
 
 //Application
-var chat = require('./resources/chat.js');
+var chat = require('./app/chat.js');
 chat.startSocketServer(container);
+
 

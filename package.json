@@ -1,9 +1,11 @@
 {
-  "name" : "qnoow-chat",
-  "version" : "0.0.1",
-  "dependencies" : {
-    "socket.io" : "0.9.x",
-    "mysql"     : "2.2.x",
-    "validator" : "3.11.x"
+  "name": "qnoow-chat",
+  "version": "0.0.1",
+  "dependencies": {
+    "socket.io": "0.9.x",
+    "mysql": "2.2.x",
+    "validator": "3.11.x",
+    "knex": "~0.5.14",
+    "bookshelf": "~0.6.10"
   }
 }
