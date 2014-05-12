@@ -21,10 +21,21 @@ module.exports = {
 		        message.collection().query(function(qb) {
   					qb
   						.whereRaw('`created_at` >= DATE_SUB(NOW(), INTERVAL 60 MINUTE)')
-  						.andWhere('user_to', user).limit(10);
+  						.andWhere(function (sub) {
+  							sub.where('user_to', user).orWhere('user_from', user)
+  						}).orderBy('created_at', 'DESC').limit(10);
 				}).fetch().then(function(collection) {
 					collection.each(function (item) {
-						socket.emit('update_chat', item.get('user_from'), item.get('message'), 'in', item.get('created_at'));
+						var recipient = "";
+						var type = "";
+						if(item.get('user_from')==user) {
+							recipient = item.get('user_to');
+							type = "out";
+						} else {
+							recipient = item.get('user_from');
+							type = "in";
+						}
+						socket.emit('update_chat', recipient, item.get('message'), type, item.get('created_at'));
 						item.set('readed', 1);
 						item.save();
 					});
@@ -45,15 +56,16 @@ module.exports = {
 		    });
 
 		    socket.on('send_message', function (user_to, messageText) {
-		        user_from = socket.user;
-		        readed = 0;
-		        messageTextEscaped = validator.escape(messageText);
+		        var user_from = socket.user;
+		        var readed = 0;
+		        var messageTextEscaped = validator.escape(messageText);
+		        var timestamp = new Date();
 		        if (users[user_to]) {
-		            io.sockets.socket(users[user_to]['socket']).emit('update_chat', user_from, messageTextEscaped, 'in', Date());
+		            io.sockets.socket(users[user_to]['socket']).emit('update_chat', user_from, messageTextEscaped, 'in', timestamp.toISOString());
 		            readed = 1;
 		        }
 		        if (users[user_from]) {
-		            io.sockets.socket(users[user_from]['socket']).emit('update_chat', user_to, messageTextEscaped,'out', Date());
+		            io.sockets.socket(users[user_from]['socket']).emit('update_chat', user_to, messageTextEscaped,'out', timestamp.toISOString());
 		        }
 		        message.forge({
 		        	'user_from': user_from,
