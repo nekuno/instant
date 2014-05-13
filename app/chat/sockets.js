@@ -20,10 +20,10 @@ module.exports = {
 
 		        message.collection().query(function(qb) {
   					qb
-  						.whereRaw('`created_at` >= DATE_SUB(NOW(), INTERVAL 60 MINUTE)')
+  						.whereRaw('`createdAt` >= DATE_SUB(NOW(), INTERVAL 60 MINUTE)')
   						.andWhere(function (sub) {
   							sub.where('user_to', user).orWhere('user_from', user)
-  						}).orderBy('created_at', 'DESC').limit(10);
+  						}).orderBy('createdAt', 'DESC').limit(10);
 				}).fetch().then(function(collection) {
 					collection.each(function (item) {
 						var recipient = "";
@@ -35,7 +35,7 @@ module.exports = {
 							recipient = item.get('user_from');
 							type = "in";
 						}
-						socket.emit('update_chat', recipient, item.get('message'), type, item.get('created_at'));
+						socket.emit('update_chat', recipient, item.get('text'), type, item.get('createdAt'));
 						item.set('readed', 1);
 						item.save();
 					});
@@ -70,8 +70,9 @@ module.exports = {
 		        message.forge({
 		        	'user_from': user_from,
 		        	'user_to' : user_to,
-		        	'message' : messageTextEscaped,
-		        	'readed' : readed
+		        	'text' : messageTextEscaped,
+		        	'readed' : readed,
+		        	'createdAt' : timestamp
 		        }).save();
 		    });
 

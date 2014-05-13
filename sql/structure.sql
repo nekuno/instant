@@ -1,9 +1,9 @@
-CREATE TABLE IF NOT EXISTS `chat` (
+CREATE TABLE IF NOT EXISTS `chat_message` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_from` int(11) NOT NULL,
   `user_to` int(11) NOT NULL,
-  `message` text COLLATE utf8_bin NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `text` text COLLATE utf8_bin NOT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `readed` bit(1) NOT NULL DEFAULT b'0',
   PRIMARY KEY (`id`),
   KEY `readed` (`readed`),

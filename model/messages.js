@@ -1,7 +1,7 @@
 module.exports = function (database) {
 	
 	var message = database.Model.extend({
-		tableName: 'chat'
+		tableName: 'chat_message'
 	});
 
     return message;
