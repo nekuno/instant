@@ -80,8 +80,9 @@ module.exports = {
 		        //Notify listeners
 		        for(var i in listeners[socket.user]) {
 		            listener = listeners[socket.user][i];
-		            console.log('l'+listener);
-		            io.sockets.socket(users[listener]['socket']).emit('user_status', socket.user, 'offline');
+		            if (users[listener]) {
+		            	io.sockets.socket(users[listener]['socket']).emit('user_status', socket.user, 'offline');
+		            }
 		        }
 		        //delete users and his suscriptions
 		        if (users[socket.user]) {
