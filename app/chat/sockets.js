@@ -15,7 +15,9 @@ module.exports = {
 		        users[user] = {'socket': socket.id, 'listening': []};
 		        for(var i in listeners[user]) {
 		            listener = listeners[user][i];
-		            io.sockets.socket(users[listener]['socket']).emit('user_status', user, 'online');
+		            if (users[listener]) {
+		            	io.sockets.socket(users[listener]['socket']).emit('user_status', user, 'online');
+		            }
 		        }
 
 		        message.collection().query(function(qb) {
