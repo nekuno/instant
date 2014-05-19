@@ -22,7 +22,7 @@ module.exports = {
 
 		        message.collection().query(function(qb) {
   					qb
-  						.whereRaw('`createdAt` >= DATE_SUB(NOW(), INTERVAL 60 MINUTE)')
+  						.whereRaw('`readed` = 0 OR `createdAt` >= DATE_SUB(NOW(), INTERVAL 60 MINUTE)')
   						.andWhere(function (sub) {
   							sub.where('user_to', user).orWhere('user_from', user)
   						}).orderBy('createdAt', 'DESC').limit(10);
@@ -38,8 +38,6 @@ module.exports = {
 							type = "in";
 						}
 						socket.emit('update_chat', recipient, item.get('text'), type, item.get('createdAt'));
-						item.set('readed', 1);
-						item.save();
 					});
 				});
 		    });
@@ -64,7 +62,6 @@ module.exports = {
 		        var timestamp = new Date();
 		        if (users[user_to]) {
 		            io.sockets.socket(users[user_to]['socket']).emit('update_chat', user_from, messageTextEscaped, 'in', timestamp.toISOString());
-		            readed = 1;
 		        }
 		        if (users[user_from]) {
 		            io.sockets.socket(users[user_from]['socket']).emit('update_chat', user_to, messageTextEscaped,'out', timestamp.toISOString());
@@ -73,9 +70,22 @@ module.exports = {
 		        	'user_from': user_from,
 		        	'user_to' : user_to,
 		        	'text' : messageTextEscaped,
-		        	'readed' : readed,
+		        	'readed' : 0,
 		        	'createdAt' : timestamp
 		        }).save();
+		    });
+
+		    socket.on('mark_as_readed', function(timestamp) {
+		    	user = socket.user;
+
+		    	qb = message.collection().query();
+
+		    	qb
+					.where('createdAt', '<=', new Date(timestamp))
+					.andWhere('user_to', user)
+					.update({
+						readed: 1
+					}).then();
 		    });
 
 		    socket.on('disconnect', function() {
