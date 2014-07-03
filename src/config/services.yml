@@ -1,0 +1,4 @@
+services:
+    kernel:
+        class    : /Service/Kernel
+        autorun  : true
