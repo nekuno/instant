@@ -2,3 +2,5 @@ services:
     kernel:
         class    : /Service/Kernel
         autorun  : true
+    database:
+        class    : /Service/Database
