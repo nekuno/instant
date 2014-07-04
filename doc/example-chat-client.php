@@ -31,10 +31,10 @@
 
         </div>
 
-        <script src="jquery.min.js"></script>
+        <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
         <script src="http://localhost:8008/socket.io/socket.io.js"></script>
         <script>
-            var socket = io.connect('http://localhost:8008');
+            var socket = io.connect('http://localhost:8008/chat?token=<?=$user?>');
             socket.emit("set_online", "<?=$user?>");
 
             <?php
