@@ -31,7 +31,7 @@ SocketManager.prototype._authorize = function(handshakeData, accept) {
 
             handshakeData.user = user;
 
-            accept(null, true);
+            return accept(null, true);
         });
 
     } else {
@@ -54,7 +54,8 @@ SocketManager.prototype._connect = function(socket) {
 SocketManager.prototype.get = function(token, callback) {
 
     // TODO: Validate token
-    callback(null, {
+    var error = token !== '1234';
+    callback(error, {
         token: token
     });
 };
