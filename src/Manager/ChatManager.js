@@ -1,6 +1,6 @@
 'use strict';
 
-var SocketManager = function(io) {
+var ChatManager = function(io) {
 
     var self = this;
 
@@ -16,7 +16,7 @@ var SocketManager = function(io) {
         });
 };
 
-SocketManager.prototype._authorize = function(handshakeData, accept) {
+ChatManager.prototype._authorize = function(handshakeData, accept) {
 
     var token = handshakeData.query.token;
 
@@ -41,7 +41,7 @@ SocketManager.prototype._authorize = function(handshakeData, accept) {
     }
 };
 
-SocketManager.prototype._connect = function(socket) {
+ChatManager.prototype._connect = function(socket) {
 
     var user = socket.handshake.user;
 
@@ -51,7 +51,7 @@ SocketManager.prototype._connect = function(socket) {
     }
 };
 
-SocketManager.prototype.get = function(token, callback) {
+ChatManager.prototype.get = function(token, callback) {
 
     // TODO: Validate token
     var error = token !== '1234';
@@ -60,4 +60,4 @@ SocketManager.prototype.get = function(token, callback) {
     });
 };
 
-module.exports = SocketManager;
+module.exports = ChatManager;
