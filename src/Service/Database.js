@@ -1,18 +1,23 @@
+var fs = require('fs');
+require('es6-shim');
+
 var Database = function(params) {
 
-    var bookshelf = require('bookshelf');
-    bookshelf.database = bookshelf.initialize({
+    var knex = require('knex')({
         client    : 'mysql',
         connection: {
             host    : params.mysql.host,
             user    : params.mysql.user,
             password: params.mysql.password,
             database: params.mysql.database,
-            charset : 'UTF8_GENERAL_CI'
+            charset : 'utf8'
         }
     });
 
-    bookshelf.database.knex.client.getRawConnection()
+    var bookshelf = require('bookshelf')(knex);
+    bookshelf.plugin('registry');
+
+    bookshelf.knex.client.acquireRawConnection()
         .then(function(connection) {
             console.info('   info  - mysql client connected to ' + connection.config.host);
         }).error(function(error) {
@@ -20,7 +25,18 @@ var Database = function(params) {
             process.exit();
         });
 
-    return bookshelf.database;
+    // Bootstrap models
+    var path = __dirname + '/../Model';
+
+    fs.readdirSync(path).forEach(function(file) {
+
+        if (!file.startsWith('.')) {
+
+            require(path + '/' + file)(bookshelf);
+        }
+    });
+
+    return bookshelf;
 
 };
 

@@ -2,11 +2,12 @@
     "name"           : "qnoow-chat",
     "version"        : "0.0.1",
     "dependencies"   : {
-        "bookshelf": "~0.6.10",
+        "bookshelf": "^0.7.6",
+        "es6-shim" : "^0.13.0",
         "fs-tools" : "^0.2.11",
         "js-yaml"  : "^3.0.2",
-        "knex"     : "~0.5.14",
-        "mysql"    : "2.2.x",
+        "knex"     : "^0.6.20",
+        "mysql"    : "^2.3.2",
         "socket.io": "0.9.x",
         "validator": "3.11.x"
     },
