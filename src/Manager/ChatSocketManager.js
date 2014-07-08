@@ -9,11 +9,16 @@ var ChatSocketManager = function(database) {
 ChatSocketManager.prototype.add = function(socket) {
 
     var self = this;
-
     var userFrom = socket.user.id;
-    self.sockets[userFrom] = socket;
-
     var Message = this.database.model('Message');
+
+    // Notify users the new user connected
+    socket.broadcast.emit('user_status', userFrom, 'online');
+    // Notify new user with already connected users
+    for (var userId in self.sockets) {
+        socket.emit('user_status', userId, 'online');
+    }
+    self.sockets[userFrom] = socket;
 
     socket.on('send_message', function(userTo, messageText) {
 
@@ -38,6 +43,7 @@ ChatSocketManager.prototype.add = function(socket) {
     });
 
     socket.on('disconnect', function() {
+        socket.broadcast.emit('user_status', userFrom, 'offline');
         delete self.sockets[userFrom];
     });
 };
