@@ -13,6 +13,7 @@ $user = $_GET['user'];
     <h2>Usuarios</h2>
     <label>Token <input type="text" name="token"/></label>
     <button id="connect">Conectar</button>
+    <button id="disconnect" style="display: none;">Desconectar</button>
     <div>
         <span style="color:red" id="error"></span>
         <span style="color:green" id="message"></span>
@@ -46,63 +47,63 @@ $user = $_GET['user'];
 
         $('#connect').remove();
         event.preventDefault();
-        var token = $('[name=token').val();
-
+        var token = $('[name=token]').val();
         var socket = io.connect('http://localhost:8008/chat?token=' + token);
 
         socket.on('connect',function() {
             $('#message').text('Conectado al socket');
+
+            $('#disconnect').show();
+
+            socket.on('user_status', function(target, status) {
+                var marca = status == 'online' ? '(online)' : '()';
+                $('#usuario' + target).html(marca);
+            });
+
+            socket.on('update_chat', function(user, message, type) {
+                if ($('#chat_panel[data-user="' + user + '"] .chatlog').length == 0) {
+                    openChat(user);
+                }
+                $('#chat_panel[data-user="' + user + '"] .chatlog').append('<hr/>' + type + ': ' + message);
+            });
+
+            function sendMessage(user) {
+                var message_input = $('#chat_panel[data-user="' + user + '"] .message_input');
+                socket.emit('send_message', user, message_input.val());
+                message_input.val('');
+            }
+
+            function openChat(user) {
+                var ventana_chat = '';
+                ventana_chat += '<div id="chat_panel" data-user="' + user + '">';
+                ventana_chat += '<h2>Usuario ' + user + '</h2>';
+                ventana_chat += '<div class="chatlog"></div>';
+                ventana_chat += '<input type="text" class="message_input"/>';
+                ventana_chat += '<button>send</button>';
+                ventana_chat += '</div>';
+                $('#chats').append(ventana_chat);
+                $('#chat_panel[data-user="' + user + '"] .message_input').keyup(function(e) {
+                    if (e.keyCode == 13) {
+                        sendMessage(user);
+                    }
+                });
+                $('#chat_panel[data-user="' + user + '"] button').on('click', function(e) {
+                    sendMessage(user);
+                });
+            }
+
+            $('.iniciar_chat').click(function() {
+                openChat($(this).data('user'));
+            });
+
+            $('#disconnect').on('click', function(event) {
+                event.preventDefault();
+                socket.disconnect();
+            });
+
         }).on('error', function() {
             $('#error').text('No se pudo conectar el socket');
         });
-
-        socket.emit("set_online", token);
-
-        <?php for ($i=1;$i<=4;$i++) { ?>
-        socket.emit("check_user", <?=$i?>);
-        <?php } ?>
-
-        socket.on("user_status", function(target, status) {
-            var marca = status == "online" ? "(online)" : "()";
-            $("#usuario" + target).html(marca);
-        });
-
-        socket.on("update_chat", function(user, message, type) {
-            if ($('#chat_panel[data-user="' + user + '"] .chatlog').length == 0) {
-                openChat(user);
-            }
-            $('#chat_panel[data-user="' + user + '"] .chatlog').append("<hr/>" + type + ": " + message);
-        });
-
-        function sendMessage(user) {
-            var message_input = $('#chat_panel[data-user="' + user + '"] .message_input');
-            socket.emit("send_message", user, message_input.val());
-            message_input.val('');
-        }
-
-        function openChat(user) {
-            var ventana_chat = '';
-            ventana_chat += '<div id="chat_panel" data-user="' + user + '">';
-            ventana_chat += '<h2>Usuario ' + user + '</h2>';
-            ventana_chat += '<div class="chatlog"></div>';
-            ventana_chat += '<input type="text" class="message_input"/>';
-            ventana_chat += '<button>send</button>';
-            ventana_chat += '</div>';
-            $('#chats').append(ventana_chat);
-            $('#chat_panel[data-user="' + user + '"] .message_input').keyup(function(e) {
-                if (e.keyCode == 13) {
-                    sendMessage(user);
-                }
-            });
-            $('#chat_panel[data-user="' + user + '"] button').on('click', function(e) {
-                sendMessage(user);
-            });
-        }
-
-        $('.iniciar_chat').click(function() {
-            openChat($(this).data('user'));
-        });
-
     });
 </script>
 </body>

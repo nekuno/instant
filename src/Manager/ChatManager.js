@@ -52,7 +52,7 @@ ChatManager.prototype._connect = function(socket) {
 ChatManager.prototype.get = function(token, callback) {
 
     // TODO: Validate token
-    var error = [1, 2, 3, 4].indexOf(token) !== -1;
+    var error = ['1', '2', '3', '4'].indexOf(token) === -1;
     callback(error, {
         id   : token,
         token: token
