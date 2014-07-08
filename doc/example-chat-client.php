@@ -1,11 +1,6 @@
-<?php
-$user = $_GET['user'];
-?>
 <!DOCTYPE html>
 <html>
-<head>
-
-</head>
+<head></head>
 <body>
 <h1>Prueba de chat</h1>
 
@@ -18,46 +13,50 @@ $user = $_GET['user'];
         <span style="color:red" id="error"></span>
         <span style="color:green" id="message"></span>
     </div>
-    <ul>
-        <?php
-        for ($i = 1; $i <= 4; $i++) {
-            if ($i != $user) {
-                ?>
-                <li>
-                    <a href='#' class='iniciar_chat' data-user='<?= $i ?>'>
-                        Usuario <?= $i ?>
-                        <span id='usuario<?= $i ?>'></span>
-                    </a>
-                </li>
-            <?php
-            }
-        }
-        ?>
-    </ul>
+    <ul id="users"></ul>
 </div>
-<div id="chats">
-
-</div>
+<div id="chats"></div>
 
 <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script src="http://localhost:8008/socket.io/socket.io.js"></script>
 <script>
 
-    $('#connect').on('click', function(event) {
+    var connect = $('#connect');
+    var disconnect = $('#disconnect');
+    var users = $('#users');
 
-        $('#connect').remove();
+    connect.on('click', function(event) {
+
+        connect.remove();
         event.preventDefault();
         var token = $('[name=token]').val();
         var socket = io.connect('http://localhost:8008/chat?token=' + token);
 
         socket.on('connect',function() {
+
             $('#message').text('Conectado al socket');
 
-            $('#disconnect').show();
+            disconnect.show();
 
-            socket.on('user_status', function(target, status) {
-                var marca = status == 'online' ? '(online)' : '()';
-                $('#usuario' + target).html(marca);
+            socket.on('user_status', function(user, status) {
+
+                var li = users.find('li[data-user="' + user + '"]');
+
+                if (li.length > 0) {
+                    li.find('span').text(status);
+                } else {
+                    var userHtml = '';
+                    userHtml += '<li data-user="' + user + '">';
+                    userHtml += '<a href="#" class="iniciar_chat" data-user=' + user + '>';
+                    userHtml += 'Usuario ' + user + ' (' + '<span>' + status + '</span>' + ')';
+                    userHtml += '</a>';
+                    userHtml += '</li>';
+                    users.append(userHtml);
+                    users.find('li[data-user="' + user + '"]').on('click', function(event) {
+                        event.preventDefault();
+                        openChat($(this).data('user'));
+                    });
+                }
             });
 
             socket.on('update_chat', function(user, message, type) {
@@ -82,22 +81,19 @@ $user = $_GET['user'];
                 ventana_chat += '<button>send</button>';
                 ventana_chat += '</div>';
                 $('#chats').append(ventana_chat);
-                $('#chat_panel[data-user="' + user + '"] .message_input').keyup(function(e) {
-                    if (e.keyCode == 13) {
+                $('#chat_panel[data-user="' + user + '"] .message_input').keyup(function(event) {
+                    if (event.keyCode == 13) {
                         sendMessage(user);
                     }
                 });
-                $('#chat_panel[data-user="' + user + '"] button').on('click', function(e) {
+                $('#chat_panel[data-user="' + user + '"] button').on('click', function(event) {
                     sendMessage(user);
                 });
             }
 
-            $('.iniciar_chat').click(function() {
-                openChat($(this).data('user'));
-            });
-
-            $('#disconnect').on('click', function(event) {
+            disconnect.on('click', function(event) {
                 event.preventDefault();
+                disconnect.remove();
                 socket.disconnect();
             });
 
