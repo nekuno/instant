@@ -5,4 +5,4 @@ parameters:
         host    : localhost
         database: qnoow
         user    : root
-        password:
+        password: ''
