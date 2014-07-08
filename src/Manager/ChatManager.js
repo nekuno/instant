@@ -1,8 +1,9 @@
 'use strict';
 
-var ChatManager = function(io) {
+var ChatManager = function(io, chatSocketManager) {
 
     var self = this;
+    this.chatSocketManager = chatSocketManager;
 
     io
         .of('/chat')
@@ -43,19 +44,17 @@ ChatManager.prototype._authorize = function(handshakeData, accept) {
 
 ChatManager.prototype._connect = function(socket) {
 
-    var user = socket.handshake.user;
+    socket.user = socket.handshake.user;
+    this.chatSocketManager.add(socket);
 
-    if (user) {
-
-        console.log('socket connected', user);
-    }
 };
 
 ChatManager.prototype.get = function(token, callback) {
 
     // TODO: Validate token
-    var error = token !== '1234';
+    var error = [1, 2, 3, 4].indexOf(token) !== -1;
     callback(error, {
+        id   : token,
         token: token
     });
 };

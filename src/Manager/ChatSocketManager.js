@@ -1,0 +1,45 @@
+var validator = require('validator');
+
+var ChatSocketManager = function(database) {
+
+    this.database = database;
+    this.sockets = {};
+};
+
+ChatSocketManager.prototype.add = function(socket) {
+
+    var self = this;
+
+    var userFrom = socket.user.id;
+    self.sockets[userFrom] = socket;
+
+    var Message = this.database.model('Message');
+
+    socket.on('send_message', function(userTo, messageText) {
+
+        var messageTextEscaped = validator.escape(messageText);
+        var timestamp = new Date();
+
+        if (self.sockets[userTo]) {
+            self.sockets[userTo].emit('update_chat', userFrom, messageTextEscaped, 'in', timestamp.toISOString());
+        }
+
+        socket.emit('update_chat', userTo, messageTextEscaped, 'out', timestamp.toISOString());
+
+        Message.forge({
+            user_from: userFrom,
+            user_to  : userTo,
+            text     : messageTextEscaped,
+            readed   : 0,
+            createdAt: timestamp
+        }).save().then(function(message) {
+            console.log(message);
+        });
+    });
+
+    socket.on('disconnect', function() {
+        delete self.sockets[userFrom];
+    });
+};
+
+module.exports = ChatSocketManager;

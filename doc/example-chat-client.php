@@ -11,7 +11,7 @@ $user = $_GET['user'];
 
 <div style="float:left;height:100%;background-color:#ccc;padding:0 15px;margin:0 10px;">
     <h2>Usuarios</h2>
-    <label>Token <input type="text" name="token" value="1234"/></label>
+    <label>Token <input type="text" name="token"/></label>
     <button id="connect">Conectar</button>
     <div>
         <span style="color:red" id="error"></span>
@@ -75,7 +75,7 @@ $user = $_GET['user'];
         });
 
         function sendMessage(user) {
-            message_input = $('#chat_panel[data-user="' + user + '"] .message_input');
+            var message_input = $('#chat_panel[data-user="' + user + '"] .message_input');
             socket.emit("send_message", user, message_input.val());
             message_input.val('');
         }
@@ -86,13 +86,16 @@ $user = $_GET['user'];
             ventana_chat += '<h2>Usuario ' + user + '</h2>';
             ventana_chat += '<div class="chatlog"></div>';
             ventana_chat += '<input type="text" class="message_input"/>';
-            ventana_chat += '<button onclick="sendMessage(' + user + ')">send</button>';
+            ventana_chat += '<button>send</button>';
             ventana_chat += '</div>';
             $('#chats').append(ventana_chat);
             $('#chat_panel[data-user="' + user + '"] .message_input').keyup(function(e) {
                 if (e.keyCode == 13) {
                     sendMessage(user);
                 }
+            });
+            $('#chat_panel[data-user="' + user + '"] button').on('click', function(e) {
+                sendMessage(user);
             });
         }
 
