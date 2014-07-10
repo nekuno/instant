@@ -38,7 +38,7 @@ ChatSocketManager.prototype.add = function(socket) {
             readed   : 0,
             createdAt: timestamp
         }).save().then(function(message) {
-            console.log(message);
+//            console.log(message);
         });
     });
 

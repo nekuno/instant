@@ -1,9 +1,10 @@
 'use strict';
 
-var ChatManager = function(io, chatSocketManager) {
+var ChatManager = function(io, chatSocketManager, database) {
 
     var self = this;
     this.chatSocketManager = chatSocketManager;
+    this.database = database;
 
     io
         .of('/chat')
@@ -23,17 +24,19 @@ ChatManager.prototype._authorize = function(handshakeData, accept) {
 
     if (token) {
 
-        this.get(token, function(error, user) {
+        this
+            .get(token)
+            .then(function(user) {
 
-            if (error || !user) {
+                if (!user) {
 
-                return accept('unauthorized token ' + token, false);
-            }
+                    return accept('unauthorized token ' + token, false);
+                }
 
-            handshakeData.user = user;
+                handshakeData.user = user;
 
-            return accept(null, true);
-        });
+                return accept(null, true);
+            });
 
     } else {
 
@@ -49,14 +52,14 @@ ChatManager.prototype._connect = function(socket) {
 
 };
 
-ChatManager.prototype.get = function(token, callback) {
+ChatManager.prototype.get = function(token) {
 
-    // TODO: Validate token
-    var error = ['1', '2', '3', '4'].indexOf(token) === -1;
-    callback(error, {
-        id   : token,
-        token: token
-    });
+    var User = this.database.model('User');
+
+    return User
+        .query({where: {salt: token}})
+        .fetch();
+
 };
 
 module.exports = ChatManager;
