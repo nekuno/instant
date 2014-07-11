@@ -9,16 +9,30 @@ var ChatSocketManager = function(database) {
 ChatSocketManager.prototype.add = function(socket) {
 
     var self = this;
-    var userFrom = socket.user.id;
+    var user = socket.user;
+    delete socket.user;
+    var userFrom = user.id;
+    var User = this.database.model('User');
     var Message = this.database.model('Message');
 
-    // Notify users the new user connected
-    // TODO: Notify only some users
-    socket.broadcast.emit('user_status', userFrom, 'online');
-    // Notify new user with already connected users
-    for (var userId in self.sockets) {
-        socket.emit('user_status', userId, 'online');
-    }
+    User.findUsersCanContactFrom(userFrom).then(function(users) {
+        users.forEach(function(user) {
+            if (self.sockets[user.id]) {
+                self.sockets[user.id].forEach(function(socket) {
+                    socket.emit('user_status', userFrom, 'online');
+                });
+            }
+        });
+    });
+
+    User.findUsersCanContactTo(userFrom).then(function(users) {
+        users.forEach(function(user) {
+            if (self.sockets[user.id] && self.sockets[user.id].length > 0) {
+                socket.emit('user_status', user.id, 'online');
+            }
+        });
+    });
+
     self.sockets[userFrom] ? self.sockets[userFrom].push(socket) : self.sockets[userFrom] = [socket];
 
     // TODO: Verify the message can be delivered
@@ -49,10 +63,20 @@ ChatSocketManager.prototype.add = function(socket) {
     });
 
     socket.on('disconnect', function() {
-        socket.broadcast.emit('user_status', userFrom, 'offline');
+
+        User.findUsersCanContactTo(userFrom).then(function(users) {
+            users.forEach(function(user) {
+                if (self.sockets[user.id]) {
+                    self.sockets[user.id].forEach(function(socket) {
+                        socket.emit('user_status', userFrom, 'offline');
+                    });
+                }
+            });
+        });
+
         self.sockets[userFrom].forEach(function(item, index) {
             if (socket === item) {
-                delete self.sockets[userFrom][index];
+                self.sockets[userFrom].splice(index, 1);
             }
         });
 
