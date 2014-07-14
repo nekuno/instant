@@ -15,7 +15,17 @@ ChatSocketManager.prototype.add = function(socket) {
     var User = this.database.model('User');
     var Message = this.database.model('Message');
 
+    // Users who can be contacted from userFrom
     User.findUsersCanContactFrom(userFrom).then(function(users) {
+        users.forEach(function(user) {
+            if (self.sockets[user.id] && self.sockets[user.id].length > 0) {
+                socket.emit('user_status', user.id, 'online');
+            }
+        });
+    });
+
+    // Users that can contact to userFrom
+    User.findUsersCanContactTo(userFrom).then(function(users) {
         users.forEach(function(user) {
             if (self.sockets[user.id]) {
                 self.sockets[user.id].forEach(function(socket) {
@@ -25,41 +35,48 @@ ChatSocketManager.prototype.add = function(socket) {
         });
     });
 
-    User.findUsersCanContactTo(userFrom).then(function(users) {
-        users.forEach(function(user) {
-            if (self.sockets[user.id] && self.sockets[user.id].length > 0) {
-                socket.emit('user_status', user.id, 'online');
-            }
-        });
-    });
-
     self.sockets[userFrom] ? self.sockets[userFrom].push(socket) : self.sockets[userFrom] = [socket];
 
-    // TODO: Verify the message can be delivered
+    socket.emit('user', user);
+
     socket.on('send_message', function(userTo, messageText) {
 
-        var messageTextEscaped = validator.escape(messageText);
-        var timestamp = new Date();
+        User
+            .canContact(userFrom, userTo)
+            .then(function(canContact) {
 
-        if (self.sockets[userTo]) {
-            self.sockets[userTo].forEach(function(socket) {
-                socket.emit('update_chat', userFrom, messageTextEscaped, 'in', timestamp.toISOString());
+                if (canContact) {
+
+                    var messageTextEscaped = validator.escape(messageText);
+                    var timestamp = new Date();
+
+                    if (self.sockets[userTo]) {
+                        self.sockets[userTo].forEach(function(socket) {
+                            socket.emit('update_chat', userFrom, messageTextEscaped, 'in', timestamp.toISOString());
+                        });
+                    }
+
+                    self.sockets[userFrom].forEach(function(socket) {
+                        socket.emit('update_chat', userTo, messageTextEscaped, 'out', timestamp.toISOString());
+                    });
+
+                    Message
+                        .forge({
+                            user_from: userFrom,
+                            user_to  : userTo,
+                            text     : messageTextEscaped,
+                            readed   : 0,
+                            createdAt: timestamp
+                        })
+                        .save()
+                        .then(function(message) {
+
+                        });
+                } else {
+                    console.error('user ' + userFrom + ' can not contact user ' + userTo);
+                }
+
             });
-        }
-
-        self.sockets[userFrom].forEach(function(socket) {
-            socket.emit('update_chat', userTo, messageTextEscaped, 'out', timestamp.toISOString());
-        });
-
-        Message.forge({
-            user_from: userFrom,
-            user_to  : userTo,
-            text     : messageTextEscaped,
-            readed   : 0,
-            createdAt: timestamp
-        }).save().then(function(message) {
-//            console.log(message);
-        });
     });
 
     socket.on('disconnect', function() {

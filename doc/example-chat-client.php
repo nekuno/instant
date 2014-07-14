@@ -34,9 +34,11 @@
 
         socket.on('connect',function() {
 
-            $('#message').text('Conectado al socket');
-
             disconnect.show();
+
+            socket.on('user', function(user) {
+                $('#message').text('Conectado al socket (Usuario ' + user.id + ')');
+            });
 
             socket.on('user_status', function(user, status) {
 
@@ -95,6 +97,8 @@
                 event.preventDefault();
                 disconnect.remove();
                 socket.disconnect();
+                $('#message').text('Desconectado del socket');
+                $('#error').text('');
             });
 
         }).on('error', function() {

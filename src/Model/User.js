@@ -52,6 +52,26 @@ var User = function(bookshelf) {
                 })
                 .groupBy('users.id')
                 .orderBy('users.id', 'ASC');
+        },
+        canContact             : function(from, to) {
+            return this
+                .query()
+                .count('* as count')
+                .first()
+                .from('user_block')
+                .where(function() {
+                    this
+                        .where('user_from', '=', from)
+                        .where('user_to', '=', to)
+                })
+                .orWhere(function() {
+                    this
+                        .where('user_from', '=', to)
+                        .where('user_to', '=', from)
+                })
+                .then(function(result) {
+                    return result.count === 0;
+                });
         }
     });
 
