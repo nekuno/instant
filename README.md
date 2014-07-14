@@ -1,15 +1,20 @@
-Nodejs chat app for Qnoow
+# Nodejs chat app for Qnoow #
 -------------------------
 
-Requisites:
-  - nodejs
-  - npm
+## Requisites ##
+* nodejs
+* npm
 
-Installation:
-  1. Download dependencies
-    npm install
-  2. Rename and edit config/config-example.js to config/config.js
-  3. Execute the server
-    nodejs app.js
+## Installation ##
+* Install dependencies.
+```
+npm install
+```
+* (Optional) Copy src/config/params.yml.dist to src/config/params.yml. If you run directly the server, you will be asked to make a copy for you.
+* Execute the server.
+```
+node src/app.js
+```
 
-Quick and dirty client example in /doc/example-chat-client.php
+## Example##
+You can find a client example in /doc/example-chat-client.php
