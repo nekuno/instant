@@ -1,0 +1,8 @@
+parameters:
+    server:
+        port: 8008
+    mysql:
+        host    : localhost
+        database: qnoow
+        user    : root
+        password: ''

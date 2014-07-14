@@ -1,0 +1,15 @@
+services:
+
+    kernel:
+        class    : /Service/Kernel
+        autorun  : true
+
+    database:
+        class    : /Service/Database
+
+    chatManager:
+        class    : /Manager/ChatManager
+        autorun  : true
+
+    chatSocketManager:
+        class    : /Manager/ChatSocketManager
