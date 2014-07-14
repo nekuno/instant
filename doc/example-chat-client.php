@@ -70,7 +70,7 @@
 
             function sendMessage(user) {
                 var message_input = $('#chat_panel[data-user="' + user + '"] .message_input');
-                socket.emit('send_message', user, message_input.val());
+                socket.emit('sendMessage', user, message_input.val());
                 message_input.val('');
             }
 
@@ -83,6 +83,9 @@
                 ventana_chat += '<button>send</button>';
                 ventana_chat += '</div>';
                 $('#chats').append(ventana_chat);
+                $('#chat_panel[data-user="' + user + '"] .message_input').on('focus', function() {
+                    socket.emit('markAsReaded', new Date().toISOString());
+                });
                 $('#chat_panel[data-user="' + user + '"] .message_input').keyup(function(event) {
                     if (event.keyCode == 13) {
                         sendMessage(user);

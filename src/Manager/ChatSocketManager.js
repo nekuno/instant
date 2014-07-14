@@ -39,7 +39,7 @@ ChatSocketManager.prototype.add = function(socket) {
 
     socket.emit('user', user);
 
-    socket.on('send_message', function(userTo, messageText) {
+    socket.on('sendMessage', function(userTo, messageText) {
 
         User
             .canContact(userFrom, userTo)
@@ -77,6 +77,18 @@ ChatSocketManager.prototype.add = function(socket) {
                 }
 
             });
+    });
+
+    socket.on('markAsReaded', function(timestamp) {
+
+        Message
+            .query()
+            .where('createdAt', '<=', new Date(timestamp))
+            .andWhere('user_to', userFrom)
+            .andWhere('readed', 0)
+            .update({
+                readed: 1
+            }).then();
     });
 
     socket.on('disconnect', function() {
