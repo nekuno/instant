@@ -62,12 +62,12 @@ var User = function(bookshelf) {
                 .where(function() {
                     this
                         .where('user_from', '=', from)
-                        .where('user_to', '=', to)
+                        .andWhere('user_to', '=', to)
                 })
                 .orWhere(function() {
                     this
                         .where('user_from', '=', to)
-                        .where('user_to', '=', from)
+                        .andWhere('user_to', '=', from)
                 })
                 .then(function(result) {
                     return result.count === 0;

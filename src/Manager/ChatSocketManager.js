@@ -17,15 +17,55 @@ ChatSocketManager.prototype.add = function(socket) {
 
     // Users who can be contacted from userFrom
     User.findUsersCanContactFrom(userFrom).then(function(users) {
+
         users.forEach(function(user) {
             if (self.sockets[user.id] && self.sockets[user.id].length > 0) {
                 socket.emit('user_status', user.id, 'online');
             }
         });
+
+        var all = users.map(function(user) {
+            return user.id;
+        });
+
+        Message
+            .query()
+            .where('readed', 0)
+            .andWhereRaw('DATE_SUB(NOW(), INTERVAL 60 MINUTE) <= createdAt')
+            .andWhere(function() {
+                this
+                    .where(function() {
+                        this
+                            .where('user_from', userFrom)
+                            .whereIn('user_to', all);
+                    })
+                    .orWhere(function() {
+                        this
+                            .where('user_to', userFrom)
+                            .whereIn('user_from', all);
+                    });
+            })
+            .orderBy('createdAt', 'DESC')
+            .limit(10)
+            .then(function(messages) {
+                messages.forEach(function(message) {
+                    var recipient = '';
+                    var type = '';
+                    if (message.user_from == userFrom) {
+                        recipient = message.user_to;
+                        type = 'out';
+                    } else {
+                        recipient = message.user_from;
+                        type = 'in';
+                    }
+                    socket.emit('update_chat', recipient, message.text, type, message.createdAt);
+                });
+            });
     });
 
     // Users that can contact to userFrom
     User.findUsersCanContactTo(userFrom).then(function(users) {
+
         users.forEach(function(user) {
             if (self.sockets[user.id]) {
                 self.sockets[user.id].forEach(function(socket) {
