@@ -16,5 +16,8 @@ npm install
 node src/app.js
 ```
 
-## Example##
+## Tests ##
+To run the tests run with `gulp`
+
+## Example ##
 You can find a client example in /doc/example-chat-client.php
