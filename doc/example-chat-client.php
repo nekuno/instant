@@ -40,7 +40,7 @@
                 $('#message').text('Conectado al socket (Usuario ' + user.id + ')');
             });
 
-            socket.on('user_status', function(user, status) {
+            socket.on('userStatus', function(user, status) {
 
                 var li = users.find('li[data-user="' + user + '"]');
 
@@ -61,7 +61,7 @@
                 }
             });
 
-            socket.on('update_chat', function(user, message, type) {
+            socket.on('updateChat', function(user, message, type) {
                 if ($('#chat_panel[data-user="' + user + '"] .chatlog').length == 0) {
                     openChat(user);
                 }

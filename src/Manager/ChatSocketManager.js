@@ -35,14 +35,17 @@ ChatSocketManager.prototype.add = function(socket) {
             .andWhere(function() {
                 this
                     .where(function() {
-                        this
-                            .where('user_from', userFrom)
-                            .whereIn('user_to', all);
+                        this.where('user_from', userFrom);
+                        if (all.length > 0) {
+                            this.whereIn('user_to', all);
+                        }
+
                     })
                     .orWhere(function() {
-                        this
-                            .where('user_to', userFrom)
-                            .whereIn('user_from', all);
+                        this.where('user_to', userFrom);
+                        if (all.length > 0) {
+                            this.whereIn('user_from', all);
+                        }
                     });
             })
             .orderBy('createdAt', 'DESC')
