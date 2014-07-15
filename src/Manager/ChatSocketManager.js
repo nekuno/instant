@@ -20,7 +20,7 @@ ChatSocketManager.prototype.add = function(socket) {
 
         users.forEach(function(user) {
             if (self.sockets[user.id] && self.sockets[user.id].length > 0) {
-                socket.emit('user_status', user.id, 'online');
+                socket.emit('userStatus', user.id, 'online');
             }
         });
 
@@ -58,7 +58,7 @@ ChatSocketManager.prototype.add = function(socket) {
                         recipient = message.user_from;
                         type = 'in';
                     }
-                    socket.emit('update_chat', recipient, message.text, type, message.createdAt);
+                    socket.emit('updateChat', recipient, message.text, type, message.createdAt);
                 });
             });
     });
@@ -69,7 +69,7 @@ ChatSocketManager.prototype.add = function(socket) {
         users.forEach(function(user) {
             if (self.sockets[user.id]) {
                 self.sockets[user.id].forEach(function(socket) {
-                    socket.emit('user_status', userFrom, 'online');
+                    socket.emit('userStatus', userFrom, 'online');
                 });
             }
         });
@@ -92,12 +92,12 @@ ChatSocketManager.prototype.add = function(socket) {
 
                     if (self.sockets[userTo]) {
                         self.sockets[userTo].forEach(function(socket) {
-                            socket.emit('update_chat', userFrom, messageTextEscaped, 'in', timestamp.toISOString());
+                            socket.emit('updateChat', userFrom, messageTextEscaped, 'in', timestamp.toISOString());
                         });
                     }
 
                     self.sockets[userFrom].forEach(function(socket) {
-                        socket.emit('update_chat', userTo, messageTextEscaped, 'out', timestamp.toISOString());
+                        socket.emit('updateChat', userTo, messageTextEscaped, 'out', timestamp.toISOString());
                     });
 
                     Message
@@ -137,7 +137,7 @@ ChatSocketManager.prototype.add = function(socket) {
             users.forEach(function(user) {
                 if (self.sockets[user.id]) {
                     self.sockets[user.id].forEach(function(socket) {
-                        socket.emit('user_status', userFrom, 'offline');
+                        socket.emit('userStatus', userFrom, 'offline');
                     });
                 }
             });
