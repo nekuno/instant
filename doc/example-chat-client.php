@@ -84,7 +84,7 @@
                 ventana_chat += '</div>';
                 $('#chats').append(ventana_chat);
                 $('#chat_panel[data-user="' + user + '"] .message_input').on('focus', function() {
-                    socket.emit('markAsReaded', new Date().toISOString());
+                    socket.emit('markAsReaded', user, new Date().toISOString());
                 });
                 $('#chat_panel[data-user="' + user + '"] .message_input').keyup(function(event) {
                     if (event.keyCode == 13) {

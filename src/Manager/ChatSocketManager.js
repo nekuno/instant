@@ -122,11 +122,12 @@ ChatSocketManager.prototype.add = function(socket) {
             });
     });
 
-    socket.on('markAsReaded', function(timestamp) {
+    socket.on('markAsReaded', function(user, timestamp) {
 
         Message
             .query()
             .where('createdAt', '<=', new Date(timestamp))
+            .andWhere('user_from', user)
             .andWhere('user_to', userFrom)
             .andWhere('readed', 0)
             .update({
