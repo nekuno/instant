@@ -19,7 +19,7 @@ var Database = function(params) {
 
     bookshelf.knex.client.acquireRawConnection()
         .then(function(connection) {
-            console.info('   info  - mysql client connected to ' + connection.config.host);
+            console.info('info: mysql client connected to ' + connection.config.host);
         }).error(function(error) {
             console.log(error.name, error.message);
             process.exit();
