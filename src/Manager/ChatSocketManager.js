@@ -30,8 +30,11 @@ ChatSocketManager.prototype.add = function(socket) {
 
         Message
             .query()
-            .where('readed', 0)
-            .andWhereRaw('DATE_SUB(NOW(), INTERVAL 60 MINUTE) <= createdAt')
+            .where(function() {
+                this
+                    .where('readed', 0)
+                    .orWhereRaw('DATE_SUB(NOW(), INTERVAL 60 MINUTE) <= createdAt');
+            })
             .andWhere(function() {
                 this
                     .where(function() {
