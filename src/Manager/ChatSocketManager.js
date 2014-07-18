@@ -9,7 +9,7 @@ var ChatSocketManager = function(database) {
 ChatSocketManager.prototype.add = function(socket) {
 
     var self = this;
-    var user = socket.user;
+    var user = socket.user.toObject();
     delete socket.user;
     var userFrom = user.id;
     var User = this.database.model('User');

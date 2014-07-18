@@ -1,12 +1,20 @@
 var User = function(bookshelf) {
 
     var User = bookshelf.Model.extend({
-        tableName: 'users'
+        tableName: 'users',
+        toObject : function() {
+            var user = this;
+            return {
+                id      : user.id,
+                username: user.get('username'),
+                email   : user.get('email')
+            }
+        }
     }, {
         findUsersCanContactFrom: function(id) {
             return this
                 .query()
-                .select('users.*')
+                .select('users.id', 'users.username', 'users.email')
                 .leftJoin('user_favorite as favorited_to', 'users.id', 'favorited_to.user_to')
                 .leftJoin('chat_message as messages_sent', 'users.id', 'messages_sent.user_from')
                 .leftJoin('chat_message as messages_received', 'users.id', 'messages_received.user_to')
@@ -31,7 +39,7 @@ var User = function(bookshelf) {
         findUsersCanContactTo  : function(id) {
             return this
                 .query()
-                .select('users.*')
+                .select('users.id', 'users.username', 'users.email')
                 .leftJoin('user_favorite as favorited_from', 'users.id', 'favorited_from.user_from')
                 .leftJoin('chat_message as messages_sent', 'users.id', 'messages_sent.user_from')
                 .leftJoin('chat_message as messages_received', 'users.id', 'messages_received.user_to')
