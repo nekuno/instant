@@ -64,7 +64,7 @@ ChatSocketManager.prototype.add = function(socket) {
                         recipient = message.user_from;
                         type = 'in';
                     }
-                    socket.emit('updateChat', recipient, message.text, type, message.createdAt);
+                    socket.emit('updateChat', recipient, message.text, type, message.createdAt, message.readed);
                 });
             });
     });
@@ -98,12 +98,12 @@ ChatSocketManager.prototype.add = function(socket) {
 
                     if (self.sockets[userTo]) {
                         self.sockets[userTo].forEach(function(socket) {
-                            socket.emit('updateChat', userFrom, messageTextEscaped, 'in', timestamp.toISOString());
+                            socket.emit('updateChat', userFrom, messageTextEscaped, 'in', timestamp.toISOString(), false);
                         });
                     }
 
                     self.sockets[userFrom].forEach(function(socket) {
-                        socket.emit('updateChat', userTo, messageTextEscaped, 'out', timestamp.toISOString());
+                        socket.emit('updateChat', userTo, messageTextEscaped, 'out', timestamp.toISOString(), true);
                     });
 
                     Message
