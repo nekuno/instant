@@ -1,4 +1,4 @@
-# Nodejs chat app for Qnoow #
+# Nodejs chat app for Qnoow 0.1.0 #
 -------------------------
 
 ## Requisites ##
@@ -10,7 +10,8 @@
 ```
 npm install
 ```
-* (Optional) Copy src/config/params.yml.dist to src/config/params.yml. If you run directly the server, you will be asked to make a copy for you.
+* Copy src/config/params.yml.dist to src/config/params.yml. If you run directly the server, you will be asked to make a copy for you.
+* Add information for the mysql connection on src/config/params.yml.
 * Execute the server.
 ```
 node src/app.js
