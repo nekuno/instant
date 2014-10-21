@@ -1,6 +1,9 @@
 parameters:
     server:
+        type: http # http or https
         port: 8008
+        key: path/to/key.key
+        cert: path/to/cert.cert
     mysql:
         host    : localhost
         database: qnoow
