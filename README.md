@@ -1,4 +1,4 @@
-# Nodejs chat app for Qnoow 0.1.0 #
+# Nodejs chat app for Qnoow 0.2.0 #
 -------------------------
 
 ## Requisites ##
