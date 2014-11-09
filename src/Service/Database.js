@@ -17,13 +17,30 @@ var Database = function(params) {
     var bookshelf = require('bookshelf')(knex);
     bookshelf.plugin('registry');
 
-    bookshelf.knex.client.acquireRawConnection()
-        .then(function(connection) {
-            console.info('info: mysql client connected to ' + connection.config.host);
-        }).error(function(error) {
-            console.log(error.name, error.message);
-            process.exit();
+    function reconnect(error) {
+        var time = 2000;
+        console.log(error);
+        console.log('Re-connecting lost connection in ' + time + ' ms.');
+        setTimeout(checkConnection, 2000);
+    }
+
+    function checkConnection() {
+
+        var connection = bookshelf.knex.client.acquireRawConnection();
+        connection.then(function(conn) {
+
+            console.info('info: mysql client connected to ' + conn.config.host);
+
+            conn.on('error', function(error) {
+                reconnect(error);
+            });
+
+        }, function(error) {
+            reconnect(error);
         });
+    }
+
+    checkConnection();
 
     // Bootstrap models
     var path = __dirname + '/../Model';
