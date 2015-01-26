@@ -1,4 +1,4 @@
-# Nodejs chat app for Qnoow 0.2.0 #
+# Nekuno Instant 0.3.0 #
 -------------------------
 
 ## Requisites ##
