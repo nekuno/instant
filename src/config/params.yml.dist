@@ -6,6 +6,6 @@ parameters:
         cert: path/to/cert.cert
     mysql:
         host    : localhost
-        database: qnoow
+        database: nekuno
         user    : root
         password: ''
