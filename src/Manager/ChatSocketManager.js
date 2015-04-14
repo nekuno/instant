@@ -1,16 +1,23 @@
 var validator = require('validator');
 
-var ChatSocketManager = function(database) {
+var ChatSocketManager = function(io, database) {
 
+    var self = this;
     this.database = database;
     this.sockets = {};
+    io
+        .of('/chat')
+        .on('connection', function(socket) {
+
+            self.add(socket);
+        });
 };
 
 ChatSocketManager.prototype.add = function(socket) {
 
     var self = this;
-    var user = socket.user.toObject();
-    delete socket.user;
+    var user = socket.handshake.user;
+    delete socket.handshake.user;
     var userFrom = user.id;
     var User = this.database.model('User');
     var Message = this.database.model('Message');

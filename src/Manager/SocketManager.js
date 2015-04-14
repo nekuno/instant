@@ -1,9 +1,8 @@
 'use strict';
 
-var ChatManager = function(io, chatSocketManager, database) {
+var SocketManager = function(io, database) {
 
     var self = this;
-    this.chatSocketManager = chatSocketManager;
     this.database = database;
 
     io
@@ -11,14 +10,17 @@ var ChatManager = function(io, chatSocketManager, database) {
         .authorization(function(handshakeData, accept) {
 
             self._authorize(handshakeData, accept);
-        })
-        .on('connection', function(socket) {
+        });
 
-            self._connect(socket);
+    io
+        .of('/workers')
+        .authorization(function(handshakeData, accept) {
+
+            self._authorize(handshakeData, accept);
         });
 };
 
-ChatManager.prototype._authorize = function(handshakeData, accept) {
+SocketManager.prototype._authorize = function(handshakeData, accept) {
 
     var token = handshakeData.query.token;
 
@@ -33,7 +35,7 @@ ChatManager.prototype._authorize = function(handshakeData, accept) {
                     return accept('unauthorized token ' + token, false);
                 }
 
-                handshakeData.user = user;
+                handshakeData.user = user.toObject();
 
                 return accept(null, true);
             });
@@ -45,14 +47,7 @@ ChatManager.prototype._authorize = function(handshakeData, accept) {
     }
 };
 
-ChatManager.prototype._connect = function(socket) {
-
-    socket.user = socket.handshake.user;
-    this.chatSocketManager.add(socket);
-
-};
-
-ChatManager.prototype.get = function(token) {
+SocketManager.prototype.get = function(token) {
 
     var User = this.database.model('User');
 
@@ -62,4 +57,4 @@ ChatManager.prototype.get = function(token) {
 
 };
 
-module.exports = ChatManager;
+module.exports = SocketManager;

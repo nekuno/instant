@@ -2,10 +2,14 @@ var Kernel = function(container) {
 
     var params = container.get('params');
     var server;
+    var express = require('express');
+    var bodyParser = require('body-parser');
+    var app = express();
+    app.use(bodyParser.json());
 
     if (params.server.type === 'http') {
 
-        server = require(params.server.type).createServer();
+        server = require(params.server.type).createServer(app);
 
     } else if (params.server.type === 'https') {
 
@@ -14,7 +18,7 @@ var Kernel = function(container) {
             key : fs.readFileSync(params.server.key),
             cert: fs.readFileSync(params.server.cert)
         };
-        server = require(params.server.type).createServer(options);
+        server = require(params.server.type).createServer(options, app);
 
     }
     server.listen(params.server.port);
@@ -22,6 +26,7 @@ var Kernel = function(container) {
     var io = require('socket.io').listen(server);
     io.set('log level', 1);
     container.add('io', io);
+    container.add('app', app);
 
 };
 

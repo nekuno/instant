@@ -1,9 +1,9 @@
-var ChatManager = require('./../../src/Manager/ChatManager');
+var ChatManager = require('./../../src/Manager/SocketManager');
 
 describe('ChatManager', function () {
 
     // TODO: Mock this dependencies
-    // var chatManager = new ChatManager;
+    // var socketManager = new SocketManager;
 
     it('should do something', function (done) {
 
