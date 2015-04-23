@@ -7,9 +7,17 @@ services:
     database:
         class    : /Service/Database
 
-    chatManager:
-        class    : /Manager/ChatManager
+    socketAPI:
+        class    : /Service/SocketAPI
+        autorun  : true
+
+    socketManager:
+        class    : /Manager/SocketManager
         autorun  : true
 
     chatSocketManager:
         class    : /Manager/ChatSocketManager
+        autorun  : true
+
+    workersSocketManager:
+        class    : /Manager/WorkersSocketManager
