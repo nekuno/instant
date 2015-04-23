@@ -1,6 +1,6 @@
 {
   "name": "instant",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "repository": "https://bitbucket.org/nekuno/instant",
   "dependencies": {
     "body-parser": "^1.12.2",
