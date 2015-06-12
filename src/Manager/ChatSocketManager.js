@@ -29,7 +29,7 @@ ChatSocketManager.prototype.add = function(socket) {
 
         users.forEach(function(user) {
             if (self.sockets[user.id] && self.sockets[user.id].length > 0) {
-                socket.emit('userStatus', user.id, 'online');
+                socket.emit('userStatus', user, 'online');
             }
         });
 
@@ -72,9 +72,7 @@ ChatSocketManager.prototype.add = function(socket) {
 
                     delete message.id;
 
-                    q.push(userFrom, function(user) {
-                        message.user = user;
-                    });
+                    message.user = user;
 
                     q.push(message.user_from, function(user) {
                         message.user_from = user;
@@ -91,10 +89,10 @@ ChatSocketManager.prototype.add = function(socket) {
     // Users that can contact to userFrom
     User.findUsersCanContactTo(userFrom).then(function(users) {
 
-        users.forEach(function(user) {
-            if (self.sockets[user.id]) {
-                self.sockets[user.id].forEach(function(socket) {
-                    socket.emit('userStatus', userFrom, 'online');
+        users.forEach(function(otherUser) {
+            if (self.sockets[otherUser.id]) {
+                self.sockets[otherUser.id].forEach(function(socket) {
+                    socket.emit('userStatus', user, 'online');
                 });
             }
         });
@@ -146,10 +144,8 @@ ChatSocketManager.prototype.add = function(socket) {
                                 }
 
                                 self.sockets[userFrom].forEach(function(socket) {
-                                    self.userManager.find(userFrom, function(user) {
-                                        message.user = user;
-                                        socket.emit('messages', [message]);
-                                    });
+                                    message.user = user;
+                                    socket.emit('messages', [message]);
                                 });
                             };
 
@@ -187,10 +183,10 @@ ChatSocketManager.prototype.add = function(socket) {
     socket.on('disconnect', function() {
 
         User.findUsersCanContactTo(userFrom).then(function(users) {
-            users.forEach(function(user) {
-                if (self.sockets[user.id]) {
-                    self.sockets[user.id].forEach(function(socket) {
-                        socket.emit('userStatus', userFrom, 'offline');
+            users.forEach(function(otherUser) {
+                if (self.sockets[otherUser.id]) {
+                    self.sockets[otherUser.id].forEach(function(socket) {
+                        socket.emit('userStatus', user, 'offline');
                     });
                 }
             });
