@@ -1,9 +1,11 @@
 var validator = require('validator');
+var async = require('async');
 
-var ChatSocketManager = function(io, database) {
+var ChatSocketManager = function(io, database, userManager) {
 
     var self = this;
     this.database = database;
+    this.userManager = userManager;
     this.sockets = {};
     io
         .of('/chat')
@@ -37,11 +39,6 @@ ChatSocketManager.prototype.add = function(socket) {
 
         Message
             .query()
-            .where(function() {
-                this
-                    .where('readed', 0)
-                    .orWhereRaw('DATE_SUB(NOW(), INTERVAL 60 MINUTE) <= createdAt');
-            })
             .andWhere(function() {
                 this
                     .where(function() {
@@ -49,7 +46,6 @@ ChatSocketManager.prototype.add = function(socket) {
                         if (all.length > 0) {
                             this.whereIn('user_to', all);
                         }
-
                     })
                     .orWhere(function() {
                         this.where('user_to', userFrom);
@@ -61,18 +57,34 @@ ChatSocketManager.prototype.add = function(socket) {
             .orderBy('createdAt', 'DESC')
             .limit(10)
             .then(function(messages) {
+
+                var q = async.queue(function(user, callback) {
+                    self.userManager.find(user, function(user) {
+                        callback(user);
+                    });
+                }, 1);
+
+                q.drain = function() {
+                    socket.emit('messages', messages);
+                };
+
                 messages.forEach(function(message) {
-                    var recipient = '';
-                    var type = '';
-                    if (message.user_from == userFrom) {
-                        recipient = message.user_to;
-                        type = 'out';
-                    } else {
-                        recipient = message.user_from;
-                        type = 'in';
-                    }
-                    socket.emit('updateChat', recipient, message.text, type, message.createdAt, message.readed);
+
+                    delete message.id;
+
+                    q.push(userFrom, function(user) {
+                        message.user = user;
+                    });
+
+                    q.push(message.user_from, function(user) {
+                        message.user_from = user;
+                    });
+
+                    q.push(message.user_to, function(user) {
+                        message.user_to = user;
+                    });
                 });
+
             });
     });
 
@@ -103,16 +115,6 @@ ChatSocketManager.prototype.add = function(socket) {
                     var messageTextEscaped = validator.escape(messageText);
                     var timestamp = new Date();
 
-                    if (self.sockets[userTo]) {
-                        self.sockets[userTo].forEach(function(socket) {
-                            socket.emit('updateChat', userFrom, messageTextEscaped, 'in', timestamp.toISOString(), false);
-                        });
-                    }
-
-                    self.sockets[userFrom].forEach(function(socket) {
-                        socket.emit('updateChat', userTo, messageTextEscaped, 'out', timestamp.toISOString(), true);
-                    });
-
                     Message
                         .forge({
                             user_from: userFrom,
@@ -123,6 +125,43 @@ ChatSocketManager.prototype.add = function(socket) {
                         })
                         .save()
                         .then(function(message) {
+
+                            message = message.toJSON();
+
+                            var q = async.queue(function(user, callback) {
+                                self.userManager.find(user, function(user) {
+                                    callback(user);
+                                });
+                            }, 1);
+
+                            q.drain = function() {
+
+                                if (self.sockets[userTo]) {
+                                    self.sockets[userTo].forEach(function(socket) {
+                                        self.userManager.find(userTo, function(user) {
+                                            message.user = user;
+                                            socket.emit('messages', [message]);
+                                        });
+                                    });
+                                }
+
+                                self.sockets[userFrom].forEach(function(socket) {
+                                    self.userManager.find(userFrom, function(user) {
+                                        message.user = user;
+                                        socket.emit('messages', [message]);
+                                    });
+                                });
+                            };
+
+                            delete message.id;
+
+                            q.push(message.user_from, function(user) {
+                                message.user_from = user;
+                            });
+
+                            q.push(message.user_to, function(user) {
+                                message.user_to = user;
+                            });
 
                         });
                 } else {

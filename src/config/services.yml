@@ -21,3 +21,6 @@ services:
 
     workersSocketManager:
         class    : /Manager/WorkersSocketManager
+
+    userManager:
+        class    : /Manager/UserManager

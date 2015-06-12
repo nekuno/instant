@@ -7,7 +7,10 @@ var User = function(bookshelf) {
             return {
                 id      : user.id,
                 username: user.get('username'),
-                email   : user.get('email')
+                email   : user.get('email'),
+                image   : {
+                    profile: user.get('picture') ? '/media/cache/resolve/profile_picture/user/images/' + user.get('picture') : '/media/cache/resolve/profile_picture/bundles/qnoowweb/images/user-no-img.jpg'
+                }
             }
         }
     }, {

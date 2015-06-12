@@ -3,6 +3,7 @@
   "version": "0.4.0",
   "repository": "https://bitbucket.org/nekuno/instant",
   "dependencies": {
+    "async": "^1.2.1",
     "body-parser": "^1.12.2",
     "bookshelf": "^0.7.9",
     "es6-shim": "^0.13.0",
@@ -15,6 +16,7 @@
     "validator": "3.11.x"
   },
   "devDependencies": {
+    "async": "^1.2.1",
     "gulp": "^3.8.5",
     "gulp-jasmine": "^0.2.0"
   }
