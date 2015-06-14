@@ -58,6 +58,11 @@ ChatSocketManager.prototype.add = function(socket) {
             .limit(10)
             .then(function(messages) {
 
+                if (messages.length == 0) {
+                    socket.emit('no-messages');
+                    return;
+                }
+
                 var q = async.queue(function(user, callback) {
                     self.userManager.find(user, function(user) {
                         callback(user);
