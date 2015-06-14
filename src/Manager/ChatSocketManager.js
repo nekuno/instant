@@ -112,6 +112,7 @@ ChatSocketManager.prototype.add = function(socket) {
 
                     var messageTextEscaped = validator.escape(messageText);
                     var timestamp = new Date();
+                    timestamp.setMilliseconds(0);
 
                     Message
                         .forge({
