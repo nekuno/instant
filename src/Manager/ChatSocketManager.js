@@ -56,37 +56,47 @@ ChatSocketManager.prototype.add = function(socket) {
     User.findUsersCanContactFrom(userFrom).then(function(users) {
 
         users.forEach(function(user) {
+
             if (self.sockets[user.id] && self.sockets[user.id].length > 0) {
                 socket.emit('userStatus', user, 'online');
             }
-        });
 
-        var all = users.map(function(user) {
-            return user.id;
+            Message
+                .query()
+                .where(function() {
+                    this
+                        .where(function() {
+                            this
+                                .where('user_from', userFrom)
+                                .andWhere('user_to', user.id);
+                        })
+                        .orWhere(function() {
+                            this
+                                .where('user_from', user.id)
+                                .andWhere('user_to', userFrom);
+                        });
+                })
+                .orderBy('createdAt', 'DESC')
+                .orderBy('id', 'DESC')
+                .limit(10)
+                .then(function(messages) {
+                    send(messages, true);
+                });
         });
 
         Message
             .query()
-            .andWhere(function() {
+            .count('id AS count')
+            .where(function() {
                 this
-                    .where(function() {
-                        this.where('user_from', userFrom);
-                        if (all.length > 0) {
-                            this.whereIn('user_to', all);
-                        }
-                    })
-                    .orWhere(function() {
-                        this.where('user_to', userFrom);
-                        if (all.length > 0) {
-                            this.whereIn('user_from', all);
-                        }
-                    });
+                    .where('user_from', userFrom)
+                    .orWhere('user_to', userFrom);
             })
             .orderBy('createdAt', 'DESC')
-            .orderBy('id', 'DESC')
-            .limit(10)
-            .then(function(messages) {
-                messages.length == 0 ? socket.emit('no-messages') : send(messages, true);
+            .then(function(count) {
+                if (count[0].count === 0) {
+                    socket.emit('no-messages');
+                }
             });
     });
 
@@ -179,12 +189,14 @@ ChatSocketManager.prototype.add = function(socket) {
             .andWhere(function() {
                 this
                     .where(function() {
-                        this.where('user_from', userFrom);
-                        this.andWhere('user_to', user);
+                        this
+                            .where('user_from', userFrom)
+                            .andWhere('user_to', user);
                     })
                     .orWhere(function() {
-                        this.where('user_from', user);
-                        this.andWhere('user_to', userFrom);
+                        this
+                            .where('user_from', user)
+                            .andWhere('user_to', userFrom);
                     });
             })
             .orderBy('createdAt', 'DESC')
