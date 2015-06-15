@@ -24,7 +24,7 @@ ChatSocketManager.prototype.add = function(socket) {
     var User = this.database.model('User');
     var Message = this.database.model('Message');
 
-    var send = function(messages) {
+    var send = function(messages, fresh) {
 
         var q = async.queue(function(user, callback) {
             self.userManager.find(user, function(user) {
@@ -33,7 +33,7 @@ ChatSocketManager.prototype.add = function(socket) {
         }, 1);
 
         q.drain = function() {
-            socket.emit('messages', messages);
+            socket.emit('messages', messages, fresh);
         };
 
         messages.forEach(function(message) {
@@ -86,7 +86,7 @@ ChatSocketManager.prototype.add = function(socket) {
             .orderBy('id', 'DESC')
             .limit(10)
             .then(function(messages) {
-                messages.length == 0 ? socket.emit('no-messages') : send(messages);
+                messages.length == 0 ? socket.emit('no-messages') : send(messages, true);
             });
     });
 
@@ -143,14 +143,14 @@ ChatSocketManager.prototype.add = function(socket) {
                                     self.sockets[userTo].forEach(function(socket) {
                                         self.userManager.find(userTo, function(user) {
                                             message.user = user;
-                                            socket.emit('messages', [message]);
+                                            socket.emit('messages', [message], true);
                                         });
                                     });
                                 }
 
                                 self.sockets[userFrom].forEach(function(socket) {
                                     message.user = user;
-                                    socket.emit('messages', [message]);
+                                    socket.emit('messages', [message], true);
                                 });
                             };
 
@@ -192,7 +192,7 @@ ChatSocketManager.prototype.add = function(socket) {
             .offset(offset)
             .limit(10)
             .then(function(messages) {
-                messages.length == 0 ? callback() : send(messages);
+                messages.length == 0 ? callback() : send(messages, false);
             });
     });
 
