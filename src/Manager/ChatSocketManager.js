@@ -116,7 +116,7 @@ ChatSocketManager.prototype.add = function(socket) {
 
     socket.emit('user', user);
 
-    socket.on('sendMessage', function(userTo, messageText) {
+    socket.on('sendMessage', function(userTo, messageText, callback) {
 
         User
             .canContact(userFrom, userTo)
@@ -162,6 +162,8 @@ ChatSocketManager.prototype.add = function(socket) {
                                     message.user = user;
                                     socket.emit('messages', [message], true);
                                 });
+
+                                callback(false);
                             };
 
                             delete message.id;
@@ -177,6 +179,7 @@ ChatSocketManager.prototype.add = function(socket) {
                         });
                 } else {
                     console.error('user ' + userFrom + ' can not contact user ' + userTo);
+                    callback('user ' + userFrom + ' can not contact user ' + userTo);
                 }
 
             });
