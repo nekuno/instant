@@ -24,6 +24,34 @@ ChatSocketManager.prototype.add = function(socket) {
     var User = this.database.model('User');
     var Message = this.database.model('Message');
 
+    var send = function(messages) {
+
+        var q = async.queue(function(user, callback) {
+            self.userManager.find(user, function(user) {
+                callback(user);
+            });
+        }, 1);
+
+        q.drain = function() {
+            socket.emit('messages', messages);
+        };
+
+        messages.forEach(function(message) {
+
+            delete message.id;
+
+            message.user = user;
+
+            q.push(message.user_from, function(user) {
+                message.user_from = user;
+            });
+
+            q.push(message.user_to, function(user) {
+                message.user_to = user;
+            });
+        });
+    };
+
     // Users who can be contacted from userFrom
     User.findUsersCanContactFrom(userFrom).then(function(users) {
 
@@ -55,39 +83,10 @@ ChatSocketManager.prototype.add = function(socket) {
                     });
             })
             .orderBy('createdAt', 'DESC')
+            .orderBy('id', 'DESC')
             .limit(10)
             .then(function(messages) {
-
-                if (messages.length == 0) {
-                    socket.emit('no-messages');
-                    return;
-                }
-
-                var q = async.queue(function(user, callback) {
-                    self.userManager.find(user, function(user) {
-                        callback(user);
-                    });
-                }, 1);
-
-                q.drain = function() {
-                    socket.emit('messages', messages);
-                };
-
-                messages.forEach(function(message) {
-
-                    delete message.id;
-
-                    message.user = user;
-
-                    q.push(message.user_from, function(user) {
-                        message.user_from = user;
-                    });
-
-                    q.push(message.user_to, function(user) {
-                        message.user_to = user;
-                    });
-                });
-
+                messages.length == 0 ? socket.emit('no-messages') : send(messages);
             });
     });
 
@@ -170,6 +169,30 @@ ChatSocketManager.prototype.add = function(socket) {
                     console.error('user ' + userFrom + ' can not contact user ' + userTo);
                 }
 
+            });
+    });
+
+    socket.on('getMessages', function(user, offset, callback) {
+
+        Message
+            .query()
+            .andWhere(function() {
+                this
+                    .where(function() {
+                        this.where('user_from', userFrom);
+                        this.andWhere('user_to', user);
+                    })
+                    .orWhere(function() {
+                        this.where('user_from', user);
+                        this.andWhere('user_to', userFrom);
+                    });
+            })
+            .orderBy('createdAt', 'DESC')
+            .orderBy('id', 'DESC')
+            .offset(offset)
+            .limit(10)
+            .then(function(messages) {
+                messages.length == 0 ? callback() : send(messages);
             });
     });
 
