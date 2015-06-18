@@ -38,8 +38,6 @@ ChatSocketManager.prototype.add = function(socket) {
 
         messages.forEach(function(message) {
 
-            delete message.id;
-
             message.user = user;
 
             q.push(message.user_from, function(user) {
@@ -165,8 +163,6 @@ ChatSocketManager.prototype.add = function(socket) {
 
                                 callback(false);
                             };
-
-                            delete message.id;
 
                             q.push(message.user_from, function(user) {
                                 message.user_from = user;
