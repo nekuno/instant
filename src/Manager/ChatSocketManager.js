@@ -116,6 +116,11 @@ ChatSocketManager.prototype.add = function(socket) {
 
     socket.on('sendMessage', function(userTo, messageText, callback) {
 
+        if (messageText === '') {
+            callback(false);
+            return;
+        }
+
         User
             .canContact(userFrom, userTo)
             .then(function(canContact) {
