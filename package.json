@@ -16,7 +16,6 @@
     "validator": "3.11.x"
   },
   "devDependencies": {
-    "async": "^1.2.1",
     "gulp": "^3.8.5",
     "gulp-jasmine": "^0.2.0"
   }
