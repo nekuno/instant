@@ -7,14 +7,19 @@ var User = function(bookshelf) {
             return {
                 id      : user.id,
                 username: user.get('username'),
-                email   : user.get('email')
+                email   : user.get('email'),
+                image   : {
+                    profile: user.get('picture') ? '/media/cache/resolve/profile_picture/user/images/' + user.get('picture') : '/media/cache/resolve/profile_picture/bundles/qnoowweb/images/user-no-img.jpg',
+                    small: user.get('picture') ? '/media/cache/resolve/user_avatar_60x60/user/images/' + user.get('picture') : '/media/cache/resolve/user_avatar_60x60/bundles/qnoowweb/images/user-no-img.jpg',
+                    medium: user.get('picture') ? '/media/cache/resolve/user_avatar_180x180/user/images/' + user.get('picture') : '/media/cache/resolve/user_avatar_180x180/bundles/qnoowweb/images/user-no-img.jpg'
+                }
             }
         }
     }, {
         findUsersCanContactFrom: function(id) {
             return this
                 .query()
-                .select('users.id', 'users.username', 'users.email')
+                .select('users.id', 'users.username', 'users.email', 'users.picture')
                 .leftJoin('user_favorite as favorited_to', 'users.id', 'favorited_to.user_to')
                 .leftJoin('chat_message as messages_sent', 'users.id', 'messages_sent.user_from')
                 .leftJoin('chat_message as messages_received', 'users.id', 'messages_received.user_to')
@@ -34,12 +39,18 @@ var User = function(bookshelf) {
                         .whereNull('blocked_to.user_from')
                 })
                 .groupBy('users.id')
-                .orderBy('users.id', 'ASC');
+                .orderBy('users.id', 'ASC')
+                .then(function(users) {
+                    users.forEach(function(user, i) {
+                        users[i] = User.forge(user).toObject();
+                    });
+                    return users;
+                });
         },
         findUsersCanContactTo  : function(id) {
             return this
                 .query()
-                .select('users.id', 'users.username', 'users.email')
+                .select('users.id', 'users.username', 'users.email', 'users.picture')
                 .leftJoin('user_favorite as favorited_from', 'users.id', 'favorited_from.user_from')
                 .leftJoin('chat_message as messages_sent', 'users.id', 'messages_sent.user_from')
                 .leftJoin('chat_message as messages_received', 'users.id', 'messages_received.user_to')
@@ -59,7 +70,13 @@ var User = function(bookshelf) {
                         .whereNull('blocked_to.user_from')
                 })
                 .groupBy('users.id')
-                .orderBy('users.id', 'ASC');
+                .orderBy('users.id', 'ASC')
+                .then(function(users) {
+                    users.forEach(function(user, i) {
+                        users[i] = User.forge(user).toObject();
+                    });
+                    return users;
+                });
         },
         canContact             : function(from, to) {
             return this

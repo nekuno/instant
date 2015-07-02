@@ -1,9 +1,11 @@
 var validator = require('validator');
+var async = require('async');
 
-var ChatSocketManager = function(io, database) {
+var ChatSocketManager = function(io, database, userManager) {
 
     var self = this;
     this.database = database;
+    this.userManager = userManager;
     this.sockets = {};
     io
         .of('/chat')
@@ -22,67 +24,87 @@ ChatSocketManager.prototype.add = function(socket) {
     var User = this.database.model('User');
     var Message = this.database.model('Message');
 
+    var send = function(messages, fresh) {
+
+        var q = async.queue(function(user, callback) {
+            self.userManager.find(user, function(user) {
+                callback(user);
+            });
+        }, 1);
+
+        q.drain = function() {
+            socket.emit('messages', messages, fresh);
+        };
+
+        messages.forEach(function(message) {
+
+            message.user = user;
+
+            q.push(message.user_from, function(user) {
+                message.user_from = user;
+            });
+
+            q.push(message.user_to, function(user) {
+                message.user_to = user;
+            });
+        });
+    };
+
     // Users who can be contacted from userFrom
     User.findUsersCanContactFrom(userFrom).then(function(users) {
 
         users.forEach(function(user) {
-            if (self.sockets[user.id] && self.sockets[user.id].length > 0) {
-                socket.emit('userStatus', user.id, 'online');
-            }
-        });
 
-        var all = users.map(function(user) {
-            return user.id;
+            if (self.sockets[user.id] && self.sockets[user.id].length > 0) {
+                socket.emit('userStatus', user, 'online');
+            }
+
+            Message
+                .query()
+                .where(function() {
+                    this
+                        .where(function() {
+                            this
+                                .where('user_from', userFrom)
+                                .andWhere('user_to', user.id);
+                        })
+                        .orWhere(function() {
+                            this
+                                .where('user_from', user.id)
+                                .andWhere('user_to', userFrom);
+                        });
+                })
+                .orderBy('createdAt', 'DESC')
+                .orderBy('id', 'DESC')
+                .limit(10)
+                .then(function(messages) {
+                    send(messages, true);
+                });
         });
 
         Message
             .query()
+            .count('id AS count')
             .where(function() {
                 this
-                    .where('readed', 0)
-                    .orWhereRaw('DATE_SUB(NOW(), INTERVAL 60 MINUTE) <= createdAt');
-            })
-            .andWhere(function() {
-                this
-                    .where(function() {
-                        this.where('user_from', userFrom);
-                        if (all.length > 0) {
-                            this.whereIn('user_to', all);
-                        }
-
-                    })
-                    .orWhere(function() {
-                        this.where('user_to', userFrom);
-                        if (all.length > 0) {
-                            this.whereIn('user_from', all);
-                        }
-                    });
+                    .where('user_from', userFrom)
+                    .orWhere('user_to', userFrom);
             })
             .orderBy('createdAt', 'DESC')
-            .limit(10)
-            .then(function(messages) {
-                messages.forEach(function(message) {
-                    var recipient = '';
-                    var type = '';
-                    if (message.user_from == userFrom) {
-                        recipient = message.user_to;
-                        type = 'out';
-                    } else {
-                        recipient = message.user_from;
-                        type = 'in';
-                    }
-                    socket.emit('updateChat', recipient, message.text, type, message.createdAt, message.readed);
-                });
+            .then(function(count) {
+                if (count[0].count === 0) {
+                    socket.emit('no-messages');
+                }
             });
     });
 
     // Users that can contact to userFrom
     User.findUsersCanContactTo(userFrom).then(function(users) {
 
-        users.forEach(function(user) {
-            if (self.sockets[user.id]) {
-                self.sockets[user.id].forEach(function(socket) {
-                    socket.emit('userStatus', userFrom, 'online');
+        users.forEach(function(otherUser) {
+            if (self.sockets[otherUser.id]) {
+                self.sockets[otherUser.id].forEach(function(socket) {
+                    socket.emit('userStatus', user, 'online');
                 });
             }
         });
@@ -92,7 +114,12 @@ ChatSocketManager.prototype.add = function(socket) {
 
     socket.emit('user', user);
 
-    socket.on('sendMessage', function(userTo, messageText) {
+    socket.on('sendMessage', function(userTo, messageText, callback) {
+
+        if (messageText === '') {
+            callback(false);
+            return;
+        }
 
         User
             .canContact(userFrom, userTo)
@@ -102,16 +129,7 @@ ChatSocketManager.prototype.add = function(socket) {
 
                     var messageTextEscaped = validator.escape(messageText);
                     var timestamp = new Date();
-
-                    if (self.sockets[userTo]) {
-                        self.sockets[userTo].forEach(function(socket) {
-                            socket.emit('updateChat', userFrom, messageTextEscaped, 'in', timestamp.toISOString(), false);
-                        });
-                    }
-
-                    self.sockets[userFrom].forEach(function(socket) {
-                        socket.emit('updateChat', userTo, messageTextEscaped, 'out', timestamp.toISOString(), true);
-                    });
+                    timestamp.setMilliseconds(0);
 
                     Message
                         .forge({
@@ -124,11 +142,73 @@ ChatSocketManager.prototype.add = function(socket) {
                         .save()
                         .then(function(message) {
 
+                            message = message.toJSON();
+
+                            var q = async.queue(function(user, callback) {
+                                self.userManager.find(user, function(user) {
+                                    callback(user);
+                                });
+                            }, 1);
+
+                            q.drain = function() {
+
+                                if (self.sockets[userTo]) {
+                                    self.sockets[userTo].forEach(function(socket) {
+                                        self.userManager.find(userTo, function(user) {
+                                            message.user = user;
+                                            socket.emit('messages', [message], true);
+                                        });
+                                    });
+                                }
+
+                                self.sockets[userFrom].forEach(function(socket) {
+                                    message.user = user;
+                                    socket.emit('messages', [message], true);
+                                });
+
+                                callback(false);
+                            };
+
+                            q.push(message.user_from, function(user) {
+                                message.user_from = user;
+                            });
+
+                            q.push(message.user_to, function(user) {
+                                message.user_to = user;
+                            });
+
                         });
                 } else {
                     console.error('user ' + userFrom + ' can not contact user ' + userTo);
+                    callback('user ' + userFrom + ' can not contact user ' + userTo);
                 }
 
+            });
+    });
+
+    socket.on('getMessages', function(user, offset, callback) {
+
+        Message
+            .query()
+            .andWhere(function() {
+                this
+                    .where(function() {
+                        this
+                            .where('user_from', userFrom)
+                            .andWhere('user_to', user);
+                    })
+                    .orWhere(function() {
+                        this
+                            .where('user_from', user)
+                            .andWhere('user_to', userFrom);
+                    });
+            })
+            .orderBy('createdAt', 'DESC')
+            .orderBy('id', 'DESC')
+            .offset(offset)
+            .limit(10)
+            .then(function(messages) {
+                messages.length == 0 ? callback() : send(messages, false);
             });
     });
 
@@ -148,10 +228,10 @@ ChatSocketManager.prototype.add = function(socket) {
     socket.on('disconnect', function() {
 
         User.findUsersCanContactTo(userFrom).then(function(users) {
-            users.forEach(function(user) {
-                if (self.sockets[user.id]) {
-                    self.sockets[user.id].forEach(function(socket) {
-                        socket.emit('userStatus', userFrom, 'offline');
+            users.forEach(function(otherUser) {
+                if (self.sockets[otherUser.id]) {
+                    self.sockets[otherUser.id].forEach(function(socket) {
+                        socket.emit('userStatus', user, 'offline');
                     });
                 }
             });
