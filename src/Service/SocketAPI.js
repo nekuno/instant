@@ -37,6 +37,12 @@ var SocketAPI = function(app, workersSocketManager) {
         res.send();
     });
 
+    router.post('/user/status', function(req, res) {
+        var body = req.body;
+        workersSocketManager.userStatus(body.userId, body.status);
+        res.send();
+    });
+
     app.use('/api', router);
 
 
