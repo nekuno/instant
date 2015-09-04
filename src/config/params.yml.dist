@@ -9,3 +9,5 @@ parameters:
         database: nekuno
         user    : root
         password: ''
+    brain:
+        base_url: http://brain.local.nekuno.com/index_dev.php/
