@@ -1,5 +1,6 @@
 var validator = require('validator');
 var async = require('async');
+var Promise = require('bluebird');
 
 var ChatSocketManager = function(io, database, userManager) {
 
@@ -26,29 +27,20 @@ ChatSocketManager.prototype.add = function(socket) {
 
     var send = function(messages, fresh) {
 
-        var q = async.queue(function(user, callback) {
-            self.userManager
-                .find(user)
-                .then(function(user) {
-                    callback(user);
-                });
-        }, 1);
-
-        q.drain = function() {
-            socket.emit('messages', messages, fresh);
-        };
-
+        var all = [];
         messages.forEach(function(message) {
 
             message.user = user;
 
-            q.push(message.user_from, function(user) {
-                message.user_from = user;
-            });
+            all.push(Promise.join(self.userManager.find(message.user_from), self.userManager.find(message.user_to), function(user_from, user_to) {
+                message.user_from = user_from;
+                message.user_to = user_to;
+            }));
 
-            q.push(message.user_to, function(user) {
-                message.user_to = user;
-            });
+        });
+
+        Promise.all(all).then(function() {
+            socket.emit('messages', messages, fresh);
         });
     };
 
@@ -153,15 +145,10 @@ ChatSocketManager.prototype.add = function(socket) {
 
                             message = message.toJSON();
 
-                            var q = async.queue(function(user, callback) {
-                                self.userManager
-                                    .find(user)
-                                    .then(function(user) {
-                                        callback(user);
-                                    });
-                            }, 1);
+                            Promise.join(self.userManager.find(message.user_from), self.userManager.find(message.user_to), function(user_from, user_to) {
 
-                            q.drain = function() {
+                                message.user_from = user_from;
+                                message.user_to = user_to;
 
                                 if (self.sockets[userTo]) {
                                     self.sockets[userTo].forEach(function(socket) {
@@ -180,16 +167,8 @@ ChatSocketManager.prototype.add = function(socket) {
                                 });
 
                                 callback(false);
-                            };
 
-                            q.push(message.user_from, function(user) {
-                                message.user_from = user;
                             });
-
-                            q.push(message.user_to, function(user) {
-                                message.user_to = user;
-                            });
-
                         });
                 } else {
                     console.error('user ' + userFrom + ' can not contact user ' + userTo);
