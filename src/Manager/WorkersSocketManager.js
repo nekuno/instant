@@ -29,4 +29,8 @@ WorkersSocketManager.prototype.processFinish = function(userId, resource) {
     this.sockets.to(userId).emit('process.finish', {resource: resource});
 };
 
+WorkersSocketManager.prototype.userStatus = function(userId, status) {
+    this.sockets.to(userId).emit('user.status', {status: status});
+};
+
 module.exports = WorkersSocketManager;
