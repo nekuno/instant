@@ -74,7 +74,7 @@ ChatSocketManager.prototype.add = function(socket) {
                     .orderBy('id', 'DESC')
                     .limit(10)
                     .then(function(messages) {
-                        send(messages, true);
+                        send(messages.reverse(), true);
                     });
 
             });
