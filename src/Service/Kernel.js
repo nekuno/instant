@@ -1,3 +1,5 @@
+var constants = require('constants');
+
 var Kernel = function(container) {
 
     var params = container.get('params');
@@ -15,8 +17,11 @@ var Kernel = function(container) {
 
         var fs = require('fs');
         var options = {
-            key : fs.readFileSync(params.server.key),
-            cert: fs.readFileSync(params.server.cert)
+            secureProtocol: 'SSLv23_method',
+            secureOptions : constants.SSL_OP_NO_SSLv3,
+            key           : fs.readFileSync(params.server.key),
+            cert          : fs.readFileSync(params.server.cert),
+            ca            : fs.readFileSync(params.server.ca)
         };
         server = require(params.server.type).createServer(options, app);
 
