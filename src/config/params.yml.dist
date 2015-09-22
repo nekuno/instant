@@ -1,9 +1,10 @@
 parameters:
     server:
-        type: http # http or https
+        type: https # http or https
         port: 8008
-        key: path/to/key.key
-        cert: path/to/cert.cert
+        key:  path/to/key.key
+        cert: path/to/cert.crt
+        ca:   path/to/ca.crt
     mysql:
         host    : localhost
         database: nekuno
