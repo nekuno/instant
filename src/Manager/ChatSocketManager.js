@@ -1,5 +1,4 @@
 var validator = require('validator');
-var async = require('async');
 var Promise = require('bluebird');
 
 var ChatSocketManager = function(io, database, userManager) {
@@ -22,7 +21,6 @@ ChatSocketManager.prototype.add = function(socket) {
     var user = socket.handshake.user;
     delete socket.handshake.user;
     var userFrom = user.id;
-    var User = this.database.model('User');
     var Message = this.database.model('Message');
 
     var send = function(messages, fresh) {

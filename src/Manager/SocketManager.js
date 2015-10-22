@@ -1,9 +1,10 @@
 'use strict';
 
-var SocketManager = function(io, database) {
+var SocketManager = function(io, database, userManager) {
 
     var self = this;
     this.database = database;
+    this.userManager = userManager;
 
     io
         .of('/chat')
@@ -27,7 +28,7 @@ SocketManager.prototype._authorize = function(handshakeData, accept) {
     if (token) {
 
         this
-            .get(token)
+            .userManager.findByToken(token)
             .then(function(user) {
 
                 if (!user) {
@@ -35,7 +36,7 @@ SocketManager.prototype._authorize = function(handshakeData, accept) {
                     return accept('unauthorized token ' + token, false);
                 }
 
-                handshakeData.user = user.toObject();
+                handshakeData.user = user;
 
                 return accept(null, true);
             });
@@ -45,16 +46,6 @@ SocketManager.prototype._authorize = function(handshakeData, accept) {
         accept('token needed', false);
 
     }
-};
-
-SocketManager.prototype.get = function(token) {
-
-    var User = this.database.model('User');
-
-    return User
-        .query({where: {salt: token}})
-        .fetch();
-
 };
 
 module.exports = SocketManager;
