@@ -23,6 +23,9 @@ UserManager.prototype.find = function(id) {
             user = self._toObject(user);
             self.users[id] = user;
             return user;
+        })
+        .error(function(error) {
+            console.log(error);
         });
 
 };
@@ -34,6 +37,9 @@ UserManager.prototype.findByToken = function(token) {
     return request({uri: this.base_url + 'users/find?salt=' + token, json: true})
         .then(function(user) {
             return self._toObject(user);
+        })
+        .error(function(error) {
+            console.log(error);
         });
 
 };
@@ -62,6 +68,9 @@ UserManager.prototype.findUsersCanContactFrom = function(id) {
                 all.push(self._toObject(user));
             });
             return all;
+        })
+        .error(function(error) {
+            console.log(error);
         });
 };
 
@@ -76,6 +85,9 @@ UserManager.prototype.findUsersCanContactTo = function(id) {
                 all.push(self._toObject(user));
             });
             return all;
+        })
+        .error(function(error) {
+            console.log(error);
         });
 };
 
@@ -87,6 +99,9 @@ UserManager.prototype.canContact = function(from, to) {
         })
         .catch(function() {
             return false;
+        })
+        .error(function(error) {
+            console.log(error);
         });
 };
 
