@@ -59,9 +59,9 @@ UserManager.prototype.findUsersCanContactFrom = function(id) {
         .then(function(users) {
             var all = [];
             users.forEach(function(user) {
-                all.push(self.find(user));
+                all.push(self._toObject(user));
             });
-            return Promise.all(all);
+            return all;
         });
 };
 
@@ -73,9 +73,9 @@ UserManager.prototype.findUsersCanContactTo = function(id) {
         .then(function(users) {
             var all = [];
             users.forEach(function(user) {
-                all.push(self.find(user));
+                all.push(self._toObject(user));
             });
-            return Promise.all(all);
+            return all;
         });
 };
 
