@@ -21,7 +21,7 @@ var Database = function(params) {
         var time = 2000;
         console.log(error);
         console.log('Re-connecting lost connection in ' + time + ' ms.');
-        setTimeout(checkConnection, 2000);
+        //setTimeout(checkConnection, 2000);
     }
 
     function checkConnection() {
@@ -32,10 +32,12 @@ var Database = function(params) {
             console.info('info: mysql client connected to ' + conn.config.host);
 
             conn.on('error', function(error) {
+                console.log('conn on error');
                 reconnect(error);
             });
 
         }, function(error) {
+            console.log('function error');
             reconnect(error);
         });
     }
