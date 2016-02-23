@@ -18,7 +18,7 @@ UserManager.prototype.find = function(id) {
         });
     }
 
-    return request({uri: this.base_url + 'users/' + id, json: true})
+    return request({uri: this.base_url + 'instant/users/' + id, json: true})
         .then(function(user) {
             user = self._toObject(user);
             self.users[id] = user;
@@ -34,7 +34,7 @@ UserManager.prototype.findByToken = function(token) {
 
     var self = this;
 
-    return request({uri: this.base_url + 'users/find?salt=' + token, json: true})
+    return request({uri: this.base_url + 'instant/users/find?salt=' + token, json: true})
         .then(function(user) {
             return self._toObject(user);
         })
@@ -61,7 +61,7 @@ UserManager.prototype.findUsersCanContactFrom = function(id) {
 
     var self = this;
 
-    return request({uri: this.base_url + 'users/' + id + '/contact/from', json: true})
+    return request({uri: this.base_url + 'instant/users/' + id + '/contact/from', json: true})
         .then(function(users) {
             var all = [];
             users.forEach(function(user) {
@@ -78,7 +78,7 @@ UserManager.prototype.findUsersCanContactTo = function(id) {
 
     var self = this;
 
-    return request({uri: this.base_url + 'users/' + id + '/contact/to', json: true})
+    return request({uri: this.base_url + 'instant/users/' + id + '/contact/to', json: true})
         .then(function(users) {
             var all = [];
             users.forEach(function(user) {
@@ -93,7 +93,7 @@ UserManager.prototype.findUsersCanContactTo = function(id) {
 
 UserManager.prototype.canContact = function(from, to) {
 
-    return request({uri: this.base_url + 'users/' + from + '/contact/' + to, json: true})
+    return request({uri: this.base_url + 'instant/users/' + from + '/contact/' + to, json: true})
         .then(function() {
             return true;
         })
