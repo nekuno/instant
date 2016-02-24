@@ -34,7 +34,7 @@ UserManager.prototype.findByToken = function(token) {
 
     var self = this;
 
-    return request({uri: this.base_url + 'instant/users/find?salt=' + token, json: true})
+    return request({uri: this.base_url + 'users', headers: {'Authorization': 'Bearer ' + token}, json: true})
         .then(function(user) {
             return self._toObject(user);
         })
