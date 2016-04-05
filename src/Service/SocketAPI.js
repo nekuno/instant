@@ -1,8 +1,17 @@
-var SocketAPI = function(app, workersSocketManager) {
+var SocketAPI = function(app, workersSocketManager, params) {
 
     app.get('/', function(req, res) {
         res.send('Welcome to the Nekuno Instant API!');
     });
+
+    var oauthshim = require('oauth-shim');
+    app.all('/oauthproxy', oauthshim);
+    oauthshim.init([{
+        client_id: params.oauthshim.client_id,
+        client_secret: params.oauthshim.client_secret,
+        grant_url: 'https://api.twitter.com/oauth/access_token',
+        domain: 'http://client.local.nekuno.com/oauthcallback.html, http://m.nekuno.com/oauthcallback.html'
+    }]);
 
     var express = require('express');
     var router = express.Router();
