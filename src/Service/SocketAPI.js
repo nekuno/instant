@@ -10,7 +10,7 @@ var SocketAPI = function(app, workersSocketManager, params) {
         client_id: params.oauthshim.client_id,
         client_secret: params.oauthshim.client_secret,
         grant_url: 'https://api.twitter.com/oauth/access_token',
-        domain: 'http://client.local.nekuno.com/oauthcallback.html, http://m.nekuno.com/oauthcallback.html'
+        domain: 'http://client.local.nekuno.com/oauthcallback.html, http://m.pre.nekuno.com/oauthcallback.html, http://m.nekuno.com/oauthcallback.html'
     }]);
 
     var express = require('express');
