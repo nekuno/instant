@@ -12,3 +12,6 @@ parameters:
         password: ''
     brain:
         base_url: http://brain.local.nekuno.com/index_dev.php/
+    oauthshim:
+        client_id:     3tn60KgFss8KfVAmCujtUY8vg
+        client_secret: aHYfKX9mGIObjSptfZl5aLJx35UqYQXlVokbf4bnyTJbIUxCgN
