@@ -13,5 +13,15 @@ parameters:
     brain:
         base_url: http://brain.local.nekuno.com/index_dev.php/
     oauthshim:
-        client_id:     3tn60KgFss8KfVAmCujtUY8vg
-        client_secret: aHYfKX9mGIObjSptfZl5aLJx35UqYQXlVokbf4bnyTJbIUxCgN
+        twitter:
+            client_id: 3tn60KgFss8KfVAmCujtUY8vg
+            client_secret: aHYfKX9mGIObjSptfZl5aLJx35UqYQXlVokbf4bnyTJbIUxCgN
+            grant_url: 'https://api.twitter.com/oauth/access_token'
+        facebook:
+            client_id: 525923770862645
+            client_secret: 1b5ed9309224e67f698848d85f7660a5
+            grant_url: 'https://graph.facebook.com/oauth/access_token'
+        google:
+            client_id: 351352065100-b98sso63rm2dncpqji11eoulter1vr9v.apps.googleusercontent.com
+            client_secret: ex8S8LdtEj8PfnAEb67T4ArF
+            grant_url: 'https://accounts.google.com/o/oauth2/token'
