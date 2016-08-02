@@ -25,3 +25,7 @@ parameters:
             client_id: 351352065100-b98sso63rm2dncpqji11eoulter1vr9v.apps.googleusercontent.com
             client_secret: ex8S8LdtEj8PfnAEb67T4ArF
             grant_url: 'https://accounts.google.com/o/oauth2/token'
+        spotify:
+            client_id: a7a47f6948034bb8977a1f89405f0804
+            client_secret: f4b2a2f2a7ab432782b6ec54b57ff7c3
+            grant_url: 'https://accounts.spotify.com/api/token'
