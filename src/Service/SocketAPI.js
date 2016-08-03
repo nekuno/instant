@@ -7,9 +7,24 @@ var SocketAPI = function(app, workersSocketManager, params) {
     var oauthshim = require('oauth-shim');
     app.all('/oauthproxy', oauthshim);
     oauthshim.init([{
-        client_id: params.oauthshim.client_id,
-        client_secret: params.oauthshim.client_secret,
-        grant_url: 'https://api.twitter.com/oauth/access_token',
+        client_id: params.oauthshim.twitter.client_id,
+        client_secret: params.oauthshim.twitter.client_secret,
+        grant_url: params.oauthshim.twitter.grant_url,
+        domain: 'http://client.local.nekuno.com/oauthcallback.html, http://m.pre.nekuno.com/oauthcallback.html, http://m.nekuno.com/oauthcallback.html'
+    }, {
+        client_id: params.oauthshim.facebook.client_id,
+        client_secret: params.oauthshim.facebook.client_secret,
+        grant_url: params.oauthshim.facebook.grant_url,
+        domain: 'http://client.local.nekuno.com/oauthcallback.html, http://m.pre.nekuno.com/oauthcallback.html, http://m.nekuno.com/oauthcallback.html'
+    }, {
+        client_id: params.oauthshim.google.client_id,
+        client_secret: params.oauthshim.google.client_secret,
+        grant_url: params.oauthshim.google.grant_url,
+        domain: 'http://client.local.nekuno.com/oauthcallback.html, http://m.pre.nekuno.com/oauthcallback.html, http://m.nekuno.com/oauthcallback.html'
+    }, {
+        client_id: params.oauthshim.spotify.client_id,
+        client_secret: params.oauthshim.spotify.client_secret,
+        grant_url: params.oauthshim.spotify.grant_url,
         domain: 'http://client.local.nekuno.com/oauthcallback.html, http://m.pre.nekuno.com/oauthcallback.html, http://m.nekuno.com/oauthcallback.html'
     }]);
 
