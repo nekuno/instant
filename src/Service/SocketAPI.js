@@ -61,6 +61,42 @@ var SocketAPI = function(app, workersSocketManager, params) {
         res.send();
     });
 
+    router.post('/similarity/start', function(req, res) {
+        var body = req.body;
+        workersSocketManager.similarityStart(body.userId);
+        res.send();
+    });
+
+    router.post('/similarity/step', function(req, res) {
+        var body = req.body;
+        workersSocketManager.similarityStep(body.userId, body.percentage);
+        res.send();
+    });
+
+    router.post('/similarity/finish', function(req, res) {
+        var body = req.body;
+        workersSocketManager.similarityFinish(body.userId);
+        res.send();
+    });
+
+    router.post('/matching/start', function(req, res) {
+        var body = req.body;
+        workersSocketManager.matchingStart(body.userId);
+        res.send();
+    });
+
+    router.post('/matching/step', function(req, res) {
+        var body = req.body;
+        workersSocketManager.matchingStep(body.userId, body.percentage);
+        res.send();
+    });
+
+    router.post('/matching/finish', function(req, res) {
+        var body = req.body;
+        workersSocketManager.matchingFinish(body.userId);
+        res.send();
+    });
+
     router.post('/user/status', function(req, res) {
         var body = req.body;
         workersSocketManager.userStatus(body.userId, body.status);

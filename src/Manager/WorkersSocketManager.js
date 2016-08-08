@@ -29,6 +29,30 @@ WorkersSocketManager.prototype.processFinish = function(userId, resource) {
     this.sockets.to(userId).emit('process.finish', {resource: resource});
 };
 
+WorkersSocketManager.prototype.similarityStart = function(userId) {
+    this.sockets.to(userId).emit('similarity.start', {});
+};
+
+WorkersSocketManager.prototype.similarityStep = function(userId, percentage) {
+    this.sockets.to(userId).emit('similarity.step', {percentage: percentage});
+};
+
+WorkersSocketManager.prototype.similarityFinish = function(userId) {
+    this.sockets.to(userId).emit('similarity.finish', {});
+};
+
+WorkersSocketManager.prototype.matchingStart = function(userId) {
+    this.sockets.to(userId).emit('matching.start', {});
+};
+
+WorkersSocketManager.prototype.matchingStep = function(userId, percentage) {
+    this.sockets.to(userId).emit('matching.step', {percentage: percentage});
+};
+
+WorkersSocketManager.prototype.matchingFinish = function(userId) {
+    this.sockets.to(userId).emit('matching.finish', {});
+};
+
 WorkersSocketManager.prototype.userStatus = function(userId, status) {
     this.sockets.to(userId).emit('user.status', {status: status});
 };
