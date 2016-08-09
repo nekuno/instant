@@ -7,6 +7,8 @@ var WorkersSocketManager = function(io) {
             var user = socket.handshake.user;
             socket.join(user.id);
         });
+    this.similarity = {};
+    this.matching = {};
 };
 
 WorkersSocketManager.prototype.fetchStart = function(userId, resource) {
@@ -29,27 +31,51 @@ WorkersSocketManager.prototype.processFinish = function(userId, resource) {
     this.sockets.to(userId).emit('process.finish', {resource: resource});
 };
 
-WorkersSocketManager.prototype.similarityStart = function(userId) {
+WorkersSocketManager.prototype.similarityStart = function(userId, processId) {
+    this.similarity[userId][processId] = 0;
     this.sockets.to(userId).emit('similarity.start', {});
 };
 
-WorkersSocketManager.prototype.similarityStep = function(userId, percentage) {
+WorkersSocketManager.prototype.similarityStep = function(userId, processId, percentage) {
+
+    this.similarity[userId][processId] = percentage;
+    percentage = 0;
+    for (var id in this.similarity[userId]) {
+        if (this.similarity[userId].hasOwnProperty(id)) {
+            percentage += this.similarity[userId][id];
+        }
+    }
+    percentage = percentage / Object.keys(this.similarity[userId]).length;
+
     this.sockets.to(userId).emit('similarity.step', {percentage: percentage});
 };
 
-WorkersSocketManager.prototype.similarityFinish = function(userId) {
+WorkersSocketManager.prototype.similarityFinish = function(userId, processId) {
+    delete this.similarity[userId][processId];
     this.sockets.to(userId).emit('similarity.finish', {});
 };
 
-WorkersSocketManager.prototype.matchingStart = function(userId) {
+WorkersSocketManager.prototype.matchingStart = function(userId, processId) {
+    this.matching[userId][processId] = 0;
     this.sockets.to(userId).emit('matching.start', {});
 };
 
-WorkersSocketManager.prototype.matchingStep = function(userId, percentage) {
+WorkersSocketManager.prototype.matchingStep = function(userId, processId, percentage) {
+
+    this.matching[userId][processId] = percentage;
+    percentage = 0;
+    for (var id in this.matching[userId]) {
+        if (this.matching[userId].hasOwnProperty(id)) {
+            percentage += this.matching[userId][id];
+        }
+    }
+    percentage = percentage / Object.keys(this.matching[userId]).length;
+
     this.sockets.to(userId).emit('matching.step', {percentage: percentage});
 };
 
-WorkersSocketManager.prototype.matchingFinish = function(userId) {
+WorkersSocketManager.prototype.matchingFinish = function(userId, processId) {
+    delete this.matching[userId][processId];
     this.sockets.to(userId).emit('matching.finish', {});
 };
 
