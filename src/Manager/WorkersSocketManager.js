@@ -32,12 +32,17 @@ WorkersSocketManager.prototype.processFinish = function(userId, resource) {
 };
 
 WorkersSocketManager.prototype.similarityStart = function(userId, processId) {
+    if (!this.similarity[userId]) {
+        this.similarity[userId] = {};
+    }
     this.similarity[userId][processId] = 0;
     this.sockets.to(userId).emit('similarity.start', {});
 };
 
 WorkersSocketManager.prototype.similarityStep = function(userId, processId, percentage) {
-
+    if (!this.similarity[userId]) {
+        this.similarity[userId] = {};
+    }
     this.similarity[userId][processId] = percentage;
     percentage = 0;
     for (var id in this.similarity[userId]) {
@@ -45,7 +50,7 @@ WorkersSocketManager.prototype.similarityStep = function(userId, processId, perc
             percentage += this.similarity[userId][id];
         }
     }
-    percentage = percentage / Object.keys(this.similarity[userId]).length;
+    percentage = parseInt(percentage / Object.keys(this.similarity[userId]).length, 10);
 
     this.sockets.to(userId).emit('similarity.step', {percentage: percentage});
 };
@@ -56,12 +61,17 @@ WorkersSocketManager.prototype.similarityFinish = function(userId, processId) {
 };
 
 WorkersSocketManager.prototype.matchingStart = function(userId, processId) {
+    if (!this.matching[userId]) {
+        this.matching[userId] = {};
+    }
     this.matching[userId][processId] = 0;
     this.sockets.to(userId).emit('matching.start', {});
 };
 
 WorkersSocketManager.prototype.matchingStep = function(userId, processId, percentage) {
-
+    if (!this.matching[userId]) {
+        this.matching[userId] = {};
+    }
     this.matching[userId][processId] = percentage;
     percentage = 0;
     for (var id in this.matching[userId]) {
@@ -69,7 +79,7 @@ WorkersSocketManager.prototype.matchingStep = function(userId, processId, percen
             percentage += this.matching[userId][id];
         }
     }
-    percentage = percentage / Object.keys(this.matching[userId]).length;
+    percentage = parseInt(percentage / Object.keys(this.matching[userId]).length, 10);
 
     this.sockets.to(userId).emit('matching.step', {percentage: percentage});
 };
