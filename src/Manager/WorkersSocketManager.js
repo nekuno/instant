@@ -56,8 +56,15 @@ WorkersSocketManager.prototype.similarityStep = function(userId, processId, perc
 };
 
 WorkersSocketManager.prototype.similarityFinish = function(userId, processId) {
-    delete this.similarity[userId][processId];
-    if (Object.keys(this.similarity[userId]).length === 0) {
+    var finish = true;
+    for (var id in this.similarity[userId]) {
+        if (this.similarity[userId].hasOwnProperty(id) && this.similarity[userId].hasOwnProperty(id) < 100) {
+            finish = false;
+            break;
+        }
+    }
+    if (finish) {
+        delete this.similarity[userId];
         this.sockets.to(userId).emit('similarity.finish', {});
     }
 };
@@ -87,8 +94,15 @@ WorkersSocketManager.prototype.matchingStep = function(userId, processId, percen
 };
 
 WorkersSocketManager.prototype.matchingFinish = function(userId, processId) {
-    delete this.matching[userId][processId];
-    if (Object.keys(this.matching[userId]).length === 0) {
+    var finish = true;
+    for (var id in this.matching[userId]) {
+        if (this.matching[userId].hasOwnProperty(id) && this.matching[userId].hasOwnProperty(id) < 100) {
+            finish = false;
+            break;
+        }
+    }
+    if (finish) {
+        delete this.matching[userId];
         this.sockets.to(userId).emit('matching.finish', {});
     }
 };
