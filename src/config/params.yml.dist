@@ -22,10 +22,10 @@ parameters:
             client_secret: 1b5ed9309224e67f698848d85f7660a5
             grant_url: 'https://graph.facebook.com/oauth/access_token'
         google:
-            client_id: 351352065100-b98sso63rm2dncpqji11eoulter1vr9v.apps.googleusercontent.com
-            client_secret: ex8S8LdtEj8PfnAEb67T4ArF
+            client_id: 351352065100-hjnd2afbiirca4nihu9ck461nv14b5l1.apps.googleusercontent.com
+            client_secret: r8SI-iK6eAYO7trO3zAEpbO4
             grant_url: 'https://accounts.google.com/o/oauth2/token'
         spotify:
-            client_id: a7a47f6948034bb8977a1f89405f0804
-            client_secret: f4b2a2f2a7ab432782b6ec54b57ff7c3
+            client_id: e8c3557e29ad4974a1f41e93aeaf6e79
+            client_secret: 4f2d9cf19b8549adab69f68dfd0df29a
             grant_url: 'https://accounts.spotify.com/api/token'
