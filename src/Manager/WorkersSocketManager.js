@@ -57,7 +57,9 @@ WorkersSocketManager.prototype.similarityStep = function(userId, processId, perc
 
 WorkersSocketManager.prototype.similarityFinish = function(userId, processId) {
     delete this.similarity[userId][processId];
-    this.sockets.to(userId).emit('similarity.finish', {});
+    if (Object.keys(this.similarity[userId]).length === 0) {
+        this.sockets.to(userId).emit('similarity.finish', {});
+    }
 };
 
 WorkersSocketManager.prototype.matchingStart = function(userId, processId) {
@@ -86,7 +88,9 @@ WorkersSocketManager.prototype.matchingStep = function(userId, processId, percen
 
 WorkersSocketManager.prototype.matchingFinish = function(userId, processId) {
     delete this.matching[userId][processId];
-    this.sockets.to(userId).emit('matching.finish', {});
+    if (Object.keys(this.matching[userId]).length === 0) {
+        this.sockets.to(userId).emit('matching.finish', {});
+    }
 };
 
 WorkersSocketManager.prototype.userStatus = function(userId, status) {
