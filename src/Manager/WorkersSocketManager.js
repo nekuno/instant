@@ -35,7 +35,6 @@ WorkersSocketManager.prototype.similarityStart = function(userId, processId) {
     if (!this.similarity[userId]) {
         this.similarity[userId] = {};
     }
-    this.similarity[userId][processId] = 0;
     this.sockets.to(userId).emit('similarity.start', {});
 };
 
@@ -73,7 +72,6 @@ WorkersSocketManager.prototype.matchingStart = function(userId, processId) {
     if (!this.matching[userId]) {
         this.matching[userId] = {};
     }
-    this.matching[userId][processId] = 0;
     this.sockets.to(userId).emit('matching.start', {});
 };
 
