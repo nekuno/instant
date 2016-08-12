@@ -58,7 +58,7 @@ WorkersSocketManager.prototype.similarityStep = function(userId, processId, perc
 WorkersSocketManager.prototype.similarityFinish = function(userId, processId) {
     var finish = true;
     for (var id in this.similarity[userId]) {
-        if (this.similarity[userId].hasOwnProperty(id) && this.similarity[userId].hasOwnProperty(id) < 100) {
+        if (this.similarity[userId].hasOwnProperty(id) && this.similarity[userId][id] < 100) {
             finish = false;
             break;
         }
@@ -96,7 +96,7 @@ WorkersSocketManager.prototype.matchingStep = function(userId, processId, percen
 WorkersSocketManager.prototype.matchingFinish = function(userId, processId) {
     var finish = true;
     for (var id in this.matching[userId]) {
-        if (this.matching[userId].hasOwnProperty(id) && this.matching[userId].hasOwnProperty(id) < 100) {
+        if (this.matching[userId].hasOwnProperty(id) && this.matching[userId][id] < 100) {
             finish = false;
             break;
         }
