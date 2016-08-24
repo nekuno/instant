@@ -12,12 +12,6 @@ UserManager.prototype.find = function(id) {
 
     var self = this;
 
-    if (self.users[id]) {
-        return new Promise(function(resolve) {
-            resolve(self.users[id]);
-        });
-    }
-
     return request({uri: this.base_url + 'instant/users/' + id, json: true})
         .then(function(user) {
             user = self._toObject(user);
@@ -46,7 +40,7 @@ UserManager.prototype.findByToken = function(token) {
 
 UserManager.prototype._toObject = function(user) {
     return {
-        id      : user.qnoow_id,
+        id      : user.id,
         username: user.username,
         email   : user.email,
         image   : {
