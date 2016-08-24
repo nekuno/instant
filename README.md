@@ -1,4 +1,4 @@
-# Nekuno Instant 0.11.1 #
+# Nekuno Instant 0.11.2 #
 -------------------------
 
 ## Requisites ##
