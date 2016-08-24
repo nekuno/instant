@@ -12,10 +12,21 @@ UserManager.prototype.find = function(id) {
 
     var self = this;
 
+    if (self.users[id]) {
+        return new Promise(function(resolve) {
+            resolve(self.users[id]);
+        });
+    }
+
     return request({uri: this.base_url + 'instant/users/' + id, json: true})
         .then(function(user) {
             user = self._toObject(user);
             self.users[id] = user;
+            setTimeout(function() {
+                if (self.users[id]) {
+                    delete self.users[id];
+                }
+            }, 1000 * 3600 * 24);
             return user;
         })
         .error(function(error) {
