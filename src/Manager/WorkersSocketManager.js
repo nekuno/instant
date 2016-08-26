@@ -9,6 +9,7 @@ var WorkersSocketManager = function(io) {
         });
     this.similarity = {};
     this.matching = {};
+    this.affinity = {};
 };
 
 WorkersSocketManager.prototype.fetchStart = function(userId, resource) {
@@ -102,6 +103,43 @@ WorkersSocketManager.prototype.matchingFinish = function(userId, processId) {
     if (finish) {
         delete this.matching[userId];
         this.sockets.to(userId).emit('matching.finish', {});
+    }
+};
+
+WorkersSocketManager.prototype.affinityStart = function(userId, processId) {
+    if (!this.affinity[userId]) {
+        this.affinity[userId] = {};
+    }
+    this.sockets.to(userId).emit('affinity.start', {});
+};
+
+WorkersSocketManager.prototype.affinityStep = function(userId, processId, percentage) {
+    if (!this.affinity[userId]) {
+        this.affinity[userId] = {};
+    }
+    this.affinity[userId][processId] = percentage;
+    percentage = 0;
+    for (var id in this.affinity[userId]) {
+        if (this.affinity[userId].hasOwnProperty(id)) {
+            percentage += this.affinity[userId][id];
+        }
+    }
+    percentage = parseInt(percentage / Object.keys(this.affinity[userId]).length, 10);
+
+    this.sockets.to(userId).emit('affinity.step', {percentage: percentage});
+};
+
+WorkersSocketManager.prototype.affinityFinish = function(userId, processId) {
+    var finish = true;
+    for (var id in this.affinity[userId]) {
+        if (this.affinity[userId].hasOwnProperty(id) && this.affinity[userId][id] < 100) {
+            finish = false;
+            break;
+        }
+    }
+    if (finish) {
+        delete this.affinity[userId];
+        this.sockets.to(userId).emit('affinity.finish', {});
     }
 };
 
