@@ -26,7 +26,7 @@ UserManager.prototype.find = function(id) {
                 if (self.users[id]) {
                     delete self.users[id];
                 }
-            }, 1000 * 3600 * 24);
+            }, 1000 * 3600);
             return user;
         })
         .error(function(error) {
