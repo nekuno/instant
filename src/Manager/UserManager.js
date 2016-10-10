@@ -54,11 +54,7 @@ UserManager.prototype._toObject = function(user) {
         id      : user.id,
         username: user.username,
         email   : user.email,
-        image   : {
-            profile: user.picture ? '/media/cache/resolve/profile_picture/user/images/' + user.picture : '/media/cache/resolve/profile_picture/bundles/qnoowweb/images/user-no-img.jpg',
-            small  : user.picture ? '/media/cache/resolve/user_avatar_60x60/user/images/' + user.picture : '/media/cache/resolve/user_avatar_60x60/bundles/qnoowweb/images/user-no-img.jpg',
-            medium : user.picture ? '/media/cache/resolve/user_avatar_180x180/user/images/' + user.picture : '/media/cache/resolve/user_avatar_180x180/bundles/qnoowweb/images/user-no-img.jpg'
-        }
+        photo   : user.photo
     }
 };
 
