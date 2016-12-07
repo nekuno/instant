@@ -10,7 +10,7 @@ var Database = function(params) {
             user    : params.mysql.user,
             password: params.mysql.password,
             database: params.mysql.database,
-            charset : 'utf8'
+            charset : 'utf8mb4'
         }
     });
 
