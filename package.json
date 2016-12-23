@@ -15,7 +15,7 @@
     "mysql": "^2.3.2",
     "oauth-shim": "^1.1.0",
     "request-promise": "^0.4.3",
-    "socket.io": "0.9.x",
+    "socket.io": "0.9.x"
   },
   "devDependencies": {
     "gulp": "^3.8.5",
