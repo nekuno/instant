@@ -1,4 +1,3 @@
-var validator = require('validator');
 var Promise = require('bluebird');
 
 var ChatSocketManager = function(io, database, userManager) {
@@ -126,7 +125,6 @@ ChatSocketManager.prototype.add = function(socket) {
 
                 if (canContact) {
 
-                    var messageTextEscaped = validator.escape(messageText);
                     var timestamp = new Date();
                     timestamp.setMilliseconds(0);
 
@@ -134,7 +132,7 @@ ChatSocketManager.prototype.add = function(socket) {
                         .forge({
                             user_from: userFrom,
                             user_to  : userTo,
-                            text     : messageTextEscaped,
+                            text     : messageText,
                             readed   : 0,
                             createdAt: timestamp
                         })
