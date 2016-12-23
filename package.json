@@ -1,6 +1,6 @@
 {
   "name": "instant",
-  "version": "0.14.1",
+  "version": "0.14.2",
   "repository": "https://bitbucket.org/nekuno/instant",
   "dependencies": {
     "async": "^1.2.1",
