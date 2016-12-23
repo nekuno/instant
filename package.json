@@ -1,6 +1,6 @@
 {
   "name": "instant",
-  "version": "0.14.2",
+  "version": "0.14.3",
   "repository": "https://bitbucket.org/nekuno/instant",
   "dependencies": {
     "async": "^1.2.1",
@@ -15,7 +15,7 @@
     "mysql": "^2.3.2",
     "oauth-shim": "^1.1.0",
     "request-promise": "^0.4.3",
-    "socket.io": "0.9.x",
+    "socket.io": "0.9.x"
   },
   "devDependencies": {
     "gulp": "^3.8.5",
