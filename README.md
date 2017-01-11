@@ -19,6 +19,3 @@ node src/app.js
 
 ## Tests ##
 To run the tests run with `gulp`
-
-## Example ##
-You can find a client example in /doc/example-chat-client.php
