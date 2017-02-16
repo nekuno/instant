@@ -118,6 +118,11 @@ ChatSocketManager.prototype.add = function(socket) {
             callback(false);
             return;
         }
+        /*if (messageText.length > 1024) {
+            console.error('Message text is too long');
+            callback('Message text is too long');
+            return;
+        }*/
 
         self.userManager
             .canContact(userFrom, userTo)
@@ -166,6 +171,10 @@ ChatSocketManager.prototype.add = function(socket) {
 
                             });
                         });
+                        /*.catch(function (error) {
+                            console.error(error);
+                            callback('Error saving message');
+                        });*/
                 } else {
                     console.error('user ' + userFrom + ' can not contact user ' + userTo);
                     callback('user ' + userFrom + ' can not contact user ' + userTo);
