@@ -1,6 +1,6 @@
 {
   "name": "instant",
-  "version": "0.15.2",
+  "version": "0.15.3",
   "author": "Nekuno",
   "license": "AGPL-3.0",
   "dependencies": {
@@ -13,7 +13,7 @@
     "js-yaml": "^3.0.2",
     "knex": "^0.7.3",
     "mysql": "^2.3.2",
-    "oauth-shim": "^1.1.0",
+    "oauth-shim": "^1.1.1",
     "request-promise": "^0.4.3",
     "socket.io": "0.9.x"
   },
