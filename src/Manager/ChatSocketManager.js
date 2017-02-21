@@ -119,6 +119,12 @@ ChatSocketManager.prototype.add = function(socket) {
             return;
         }
 
+        if (messageText.length > 1024) {
+            console.error('Message text is too long');
+            callback('Message text is too long');
+            return;
+        }
+
         self.userManager
             .canContact(userFrom, userTo)
             .then(function(canContact) {
@@ -165,6 +171,10 @@ ChatSocketManager.prototype.add = function(socket) {
                                 callback(false);
 
                             });
+                        })
+                        .catch(function(error) {
+                            console.error(error);
+                            callback('Error saving message');
                         });
                 } else {
                     console.error('user ' + userFrom + ' can not contact user ' + userTo);
