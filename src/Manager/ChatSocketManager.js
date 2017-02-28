@@ -119,7 +119,7 @@ ChatSocketManager.prototype.add = function(socket) {
             return;
         }
 
-        if (messageText.length > 1024) {
+        if (messageText.length > 3000) {
             console.error('Message text is too long');
             callback('Message text is too long');
             return;
