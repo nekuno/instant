@@ -115,7 +115,6 @@ ChatSocketManager.prototype.add = function(socket) {
     socket.on('sendMessage', function(userTo, messageText, callback) {
 
         if (messageText === '') {
-            callback(false);
             return;
         }
 
@@ -167,9 +166,6 @@ ChatSocketManager.prototype.add = function(socket) {
                                     message.user = user;
                                     socket.emit('messages', [message], true);
                                 });
-
-                                callback(false);
-
                             });
                         })
                         .catch(function(error) {
