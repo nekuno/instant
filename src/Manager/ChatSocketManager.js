@@ -115,11 +115,10 @@ ChatSocketManager.prototype.add = function(socket) {
     socket.on('sendMessage', function(userTo, messageText, callback) {
 
         if (messageText === '') {
-            callback(false);
             return;
         }
 
-        if (messageText.length > 1024) {
+        if (messageText.length > 3000) {
             console.error('Message text is too long');
             callback('Message text is too long');
             return;
@@ -167,9 +166,6 @@ ChatSocketManager.prototype.add = function(socket) {
                                     message.user = user;
                                     socket.emit('messages', [message], true);
                                 });
-
-                                callback(false);
-
                             });
                         })
                         .catch(function(error) {
