@@ -12,7 +12,7 @@ var NotificationsSocketManager = function(io) {
 NotificationsSocketManager.prototype.message = function(userId, slug, title, body, locale, icon) {
     icon = typeof icon !== 'undefined' ? icon : 'https://nekuno.com/favicon-150.png';
     var lang = "en-US";
-    if (locale.indexOf("es") !== -1) {
+    if (locale && locale.indexOf("es") !== -1) {
         lang = "es-ES";
     }
     this.sockets.to(userId).emit('message', {slug: slug, title: title, body: body, lang: lang, icon: icon});
