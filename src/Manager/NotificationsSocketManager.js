@@ -10,7 +10,7 @@ var NotificationsSocketManager = function(io) {
 };
 
 NotificationsSocketManager.prototype.message = function(userId, slug, title, body, locale, icon) {
-    icon = typeof icon !== 'undefined' ? icon : 'https://nekuno.com/favicon-150.png';
+    icon = typeof icon !== 'undefined' && icon ? icon : 'https://nekuno.com/favicon-150.png';
     var lang = "en-US";
     if (locale && locale.indexOf("es") !== -1) {
         lang = "es-ES";
