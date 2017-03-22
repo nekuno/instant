@@ -1,10 +1,11 @@
 var Promise = require('bluebird');
 
-var ChatSocketManager = function(io, database, userManager) {
+var ChatSocketManager = function(io, database, userManager, notificationsSocketManager) {
 
     var self = this;
     this.database = database;
     this.userManager = userManager;
+    this.notificationsSocketManager = notificationsSocketManager;
     this.sockets = {};
     io
         .of('/chat')
@@ -158,6 +159,10 @@ ChatSocketManager.prototype.add = function(socket) {
                                             .then(function(user) {
                                                 message.user = user;
                                                 socket.emit('messages', [message], true);
+                                                var title = user_to.locale === 'es' ? 'Nuevo mensaje' : 'New message';
+                                                var body = user_to.locale === 'es' ? user_from.usernameCanonical + ' te ha enviado un mensaje.'
+                                                    : user_from.usernameCanonical + ' has just sent you a message.' ;
+                                                self.notificationsSocketManager.message(userTo, user_from.slug, title, body, user_to.locale);
                                             });
                                     });
                                 }
