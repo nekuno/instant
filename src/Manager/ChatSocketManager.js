@@ -160,8 +160,8 @@ ChatSocketManager.prototype.add = function(socket) {
                                                 message.user = user;
                                                 socket.emit('messages', [message], true);
                                                 var title = user_to.locale === 'es' ? 'Nuevo mensaje' : 'New message';
-                                                var body = user_to.locale === 'es' ? user_from.usernameCanonical + ' te ha enviado un mensaje.'
-                                                    : user_from.usernameCanonical + ' has just sent you a message.' ;
+                                                var body = user_to.locale === 'es' ? user_from.username + ' te ha enviado un mensaje.'
+                                                    : user_from.username + ' has just sent you a message.' ;
                                                 self.notificationsSocketManager.message(userTo, user_from.slug, title, body, user_to.locale);
                                             });
                                     });
