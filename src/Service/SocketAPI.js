@@ -121,9 +121,9 @@ var SocketAPI = function(app, workersSocketManager, notificationsSocketManager, 
         res.send();
     });
 
-    router.post('/notification/message', function(req, res) {
+    router.post('/notification', function(req, res) {
         var body = req.body;
-        notificationsSocketManager.message(body.userId, body.slug, body.title, body.message, body.locale, body.icon);
+        notificationsSocketManager.notify(body.userId, body.data);
         res.send();
     });
 

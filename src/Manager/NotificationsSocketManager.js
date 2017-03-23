@@ -9,13 +9,8 @@ var NotificationsSocketManager = function(io) {
         });
 };
 
-NotificationsSocketManager.prototype.message = function(userId, slug, title, body, locale, icon) {
-    icon = typeof icon !== 'undefined' && icon ? icon : 'https://nekuno.com/favicon-150.png';
-    var lang = "en-US";
-    if (locale && locale.indexOf("es") !== -1) {
-        lang = "es-ES";
-    }
-    this.sockets.to(userId).emit('message', {slug: slug, title: title, body: body, lang: lang, icon: icon});
+NotificationsSocketManager.prototype.notify = function(userId, data) {
+    this.sockets.to(userId).emit('notification', data);
 };
 
 module.exports = NotificationsSocketManager;
