@@ -159,14 +159,11 @@ ChatSocketManager.prototype.add = function(socket) {
                                             .then(function(user) {
                                                 message.user = user;
                                                 socket.emit('messages', [message], true);
-                                                var icon = user_from.photo && user_from.photo.thumbnail && user_from.photo.thumbnail.small ?
-                                                    user_from.photo.thumbnail.small
-                                                    : user_from.photo && user_from.photo.url ? user_from.photo.url : null;
                                                 const data = {
                                                     type: 'message',
                                                     slug: user_from.slug,
                                                     username: user_from.username,
-                                                    icon: icon
+                                                    photo: user_from.photo
                                                 };
                                                 self.notificationsSocketManager.notify(userTo, data);
                                             });
