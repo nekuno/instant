@@ -19,6 +19,12 @@ var SocketManager = function(io, database, userManager) {
 
             self._authorize(handshakeData, accept);
         });
+    io
+        .of('/notifications')
+        .authorization(function(handshakeData, accept) {
+
+            self._authorize(handshakeData, accept);
+        });
 };
 
 SocketManager.prototype._authorize = function(handshakeData, accept) {
