@@ -9,8 +9,8 @@ var NotificationsSocketManager = function(io) {
         });
 };
 
-NotificationsSocketManager.prototype.notify = function(userId, data) {
-    this.sockets.to(userId).emit('notification', data);
+NotificationsSocketManager.prototype.notify = function(userId, category, data) {
+    this.sockets.to(userId).emit('notification', category, data);
 };
 
 module.exports = NotificationsSocketManager;

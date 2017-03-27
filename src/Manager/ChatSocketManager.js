@@ -163,7 +163,8 @@ ChatSocketManager.prototype.add = function(socket) {
                                                     type: 'message',
                                                     slug: user_from.slug,
                                                     username: user_from.username,
-                                                    photo: user_from.photo
+                                                    photo: user_from.photo,
+                                                    text: message.text
                                                 };
                                                 self.notificationsSocketManager.notify(userTo, data);
                                             });

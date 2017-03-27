@@ -123,7 +123,7 @@ var SocketAPI = function(app, workersSocketManager, notificationsSocketManager, 
 
     router.post('/notification', function(req, res) {
         var body = req.body;
-        notificationsSocketManager.notify(body.userId, body.data);
+        notificationsSocketManager.notify(body.userId, body.category, body.data);
         res.send();
     });
 
