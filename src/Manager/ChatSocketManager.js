@@ -159,14 +159,14 @@ ChatSocketManager.prototype.add = function(socket) {
                                             .then(function(user) {
                                                 message.user = user;
                                                 socket.emit('messages', [message], true);
+                                                const category = 'message';
                                                 const data = {
-                                                    type: 'message',
                                                     slug: user_from.slug,
                                                     username: user_from.username,
                                                     photo: user_from.photo,
                                                     text: message.text
                                                 };
-                                                self.notificationsSocketManager.notify(userTo, data);
+                                                self.notificationsSocketManager.notify(userTo, category, data);
                                             });
                                     });
                                 }
