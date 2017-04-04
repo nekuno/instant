@@ -1,4 +1,4 @@
-var SocketAPI = function(app, workersSocketManager, params) {
+var SocketAPI = function(app, workersSocketManager, notificationsSocketManager, params) {
 
     app.get('/', function(req, res) {
         res.send('Welcome to the Nekuno Instant API!');
@@ -118,6 +118,12 @@ var SocketAPI = function(app, workersSocketManager, params) {
     router.post('/user/status', function(req, res) {
         var body = req.body;
         workersSocketManager.userStatus(body.userId, body.status);
+        res.send();
+    });
+
+    router.post('/notification', function(req, res) {
+        var body = req.body;
+        notificationsSocketManager.notify(body.userId, body.category, body.data);
         res.send();
     });
 
