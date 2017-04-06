@@ -246,7 +246,7 @@ ChatSocketManager.prototype._send = function (userFrom, userTo, messageText, cal
 
                             if (self.sockets[userFrom]) {
                                 self.sockets[userFrom].forEach(function (socket) {
-                                    message.user = user;
+                                    message.user = user_from;
                                     socket.emit('messages', [message], true);
                                 });
                             }
