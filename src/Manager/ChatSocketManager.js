@@ -118,7 +118,7 @@ ChatSocketManager.prototype.add = function(socket) {
     socket.emit('user', user);
 
     socket.on('sendMessage', function(userTo, messageText, callback) {
-        self._send(userTo, userFrom, messageText, callback);
+        self._send(userFrom, userTo, messageText, callback);
     });
 
     socket.on('getMessages', function(user, offset, callback) {
