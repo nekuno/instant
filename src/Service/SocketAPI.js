@@ -33,11 +33,17 @@ var SocketAPI = function(app, workersSocketManager, chatSocketManager, notificat
 
     /** Auth Middleware **/
     router.use(function (req, res, next) {
-        var auth = new Buffer(req.headers.authorization.split(" ")[1], 'base64').toString();
-        var username = auth.split(':')[0];
-        var pass = auth.split(':')[1];
-        if (username === 'brain' && pass === params.api_secret) {
-            next();
+        if (req.headers.authorization) {
+            var auth = new Buffer(req.headers.authorization.split(" ")[1], 'base64').toString();
+            var username = auth.split(':')[0];
+            var pass = auth.split(':')[1];
+            if (username === 'brain' && pass === params.api_secret) {
+                next();
+            } else {
+                res.status(500).send('Bad credentials');
+            }
+        } else {
+            res.status(500).send('You cannot access this server');
         }
     });
     /** End middleware **/
