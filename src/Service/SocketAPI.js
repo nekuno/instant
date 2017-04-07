@@ -31,6 +31,17 @@ var SocketAPI = function(app, workersSocketManager, chatSocketManager, notificat
     var express = require('express');
     var router = express.Router();
 
+    /** Auth Middleware **/
+    router.use(function (req, res, next) {
+        var auth = new Buffer(req.headers.authorization.split(" ")[1], 'base64').toString();
+        var username = auth.split(':')[0];
+        var pass = auth.split(':')[1];
+        if (username === 'brain' && pass === params.api_secret) {
+            next();
+        }
+    });
+    /** End middleware **/
+
     router.post('/fetch/start', function(req, res) {
         var body = req.body;
         workersSocketManager.fetchStart(body.userId, body.resource);
