@@ -54,7 +54,8 @@ UserManager.prototype._toObject = function(user) {
         id      : user.id,
         username: user.username,
         photo   : user.photo,
-        slug    : user.slug
+        slug    : user.slug,
+        enabled : user.enabled
     }
 };
 
