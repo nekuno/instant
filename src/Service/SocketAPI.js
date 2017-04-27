@@ -1,4 +1,4 @@
-var SocketAPI = function(app, workersSocketManager, notificationsSocketManager, params) {
+var SocketAPI = function(app, workersSocketManager, chatSocketManager, notificationsSocketManager, params) {
 
     app.get('/', function(req, res) {
         res.send('Welcome to the Nekuno Instant API!');
@@ -30,6 +30,23 @@ var SocketAPI = function(app, workersSocketManager, notificationsSocketManager, 
 
     var express = require('express');
     var router = express.Router();
+
+    /** Auth Middleware **/
+    router.use(function (req, res, next) {
+        if (req.headers.authorization) {
+            var auth = new Buffer(req.headers.authorization.split(" ")[1], 'base64').toString();
+            var username = auth.split(':')[0];
+            var pass = auth.split(':')[1];
+            if (username === 'brain' && pass === params.api_secret) {
+                next();
+            } else {
+                res.status(500).send('Bad credentials');
+            }
+        } else {
+            res.status(500).send('You cannot access this server');
+        }
+    });
+    /** End middleware **/
 
     router.post('/fetch/start', function(req, res) {
         var body = req.body;
@@ -118,6 +135,12 @@ var SocketAPI = function(app, workersSocketManager, notificationsSocketManager, 
     router.post('/user/status', function(req, res) {
         var body = req.body;
         workersSocketManager.userStatus(body.userId, body.status);
+        res.send();
+    });
+
+    router.post('/message', function(req, res) {
+        var body = req.body;
+        chatSocketManager.message(body.userFromId, body.userToId, body.text);
         res.send();
     });
 

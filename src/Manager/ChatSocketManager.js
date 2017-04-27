@@ -15,6 +15,10 @@ var ChatSocketManager = function(io, database, userManager, notificationsSocketM
         });
 };
 
+ChatSocketManager.prototype.message = function(userFromId, userToId, text) {
+    this._send(userFromId, userToId, text, function(a){});
+};
+
 ChatSocketManager.prototype.add = function(socket) {
 
     var self = this;
@@ -114,79 +118,7 @@ ChatSocketManager.prototype.add = function(socket) {
     socket.emit('user', user);
 
     socket.on('sendMessage', function(userTo, messageText, callback) {
-
-        if (messageText === '') {
-            return;
-        }
-
-        if (messageText.length > 3000) {
-            console.error('Message text is too long');
-            callback('Message text is too long');
-            return;
-        }
-
-        self.userManager
-            .canContact(userFrom, userTo)
-            .then(function(canContact) {
-
-                if (canContact) {
-
-                    var timestamp = new Date();
-                    timestamp.setMilliseconds(0);
-
-                    Message
-                        .forge({
-                            user_from: userFrom,
-                            user_to  : userTo,
-                            text     : messageText,
-                            readed   : 0,
-                            createdAt: timestamp
-                        })
-                        .save()
-                        .then(function(message) {
-
-                            message = message.toJSON();
-
-                            Promise.join(self.userManager.find(message.user_from), self.userManager.find(message.user_to), function(user_from, user_to) {
-
-                                message.user_from = user_from;
-                                message.user_to = user_to;
-
-                                if (self.sockets[userTo]) {
-                                    self.sockets[userTo].forEach(function(socket) {
-                                        self.userManager
-                                            .find(userTo)
-                                            .then(function(user) {
-                                                message.user = user;
-                                                socket.emit('messages', [message], true);
-                                                const category = 'message';
-                                                const data = {
-                                                    slug: user_from.slug,
-                                                    username: user_from.username,
-                                                    photo: user_from.photo,
-                                                    text: message.text
-                                                };
-                                                self.notificationsSocketManager.notify(userTo, category, data);
-                                            });
-                                    });
-                                }
-
-                                self.sockets[userFrom].forEach(function(socket) {
-                                    message.user = user;
-                                    socket.emit('messages', [message], true);
-                                });
-                            });
-                        })
-                        .catch(function(error) {
-                            console.error(error);
-                            callback('Error saving message');
-                        });
-                } else {
-                    console.error('user ' + userFrom + ' can not contact user ' + userTo);
-                    callback('user ' + userFrom + ' can not contact user ' + userTo);
-                }
-
-            });
+        self._send(userFrom, userTo, messageText, callback);
     });
 
     socket.on('getMessages', function(user, offset, callback) {
@@ -249,6 +181,87 @@ ChatSocketManager.prototype.add = function(socket) {
         });
 
     });
+};
+
+
+ChatSocketManager.prototype._send = function (userFrom, userTo, messageText, callback) {
+    var self = this;
+    var Message = this.database.model('Message');
+
+    if (messageText === '') {
+        return;
+    }
+
+    if (messageText.length > 3000) {
+        console.error('Message text is too long');
+        callback('Message text is too long');
+        return;
+    }
+
+    self.userManager
+        .canContact(userFrom, userTo)
+        .then(function(canContact) {
+
+            if (canContact) {
+
+                var timestamp = new Date();
+                timestamp.setMilliseconds(0);
+
+                Message
+                    .forge({
+                        user_from: userFrom,
+                        user_to  : userTo,
+                        text     : messageText,
+                        readed   : 0,
+                        createdAt: timestamp
+                    })
+                    .save()
+                    .then(function(message) {
+
+                        message = message.toJSON();
+
+                        Promise.join(self.userManager.find(message.user_from), self.userManager.find(message.user_to), function(user_from, user_to) {
+
+                            message.user_from = user_from;
+                            message.user_to = user_to;
+
+                            if (self.sockets[userTo]) {
+                                self.sockets[userTo].forEach(function(socket) {
+                                    self.userManager
+                                        .find(userTo)
+                                        .then(function(user) {
+                                            message.user = user;
+                                            socket.emit('messages', [message], true);
+                                            const category = 'message';
+                                            const data = {
+                                                slug: user_from.slug,
+                                                username: user_from.username,
+                                                photo: user_from.photo,
+                                                text: message.text
+                                            };
+                                            self.notificationsSocketManager.notify(userTo, category, data);
+                                        });
+                                });
+                            }
+
+                            if (self.sockets[userFrom]) {
+                                self.sockets[userFrom].forEach(function (socket) {
+                                    message.user = user_from;
+                                    socket.emit('messages', [message], true);
+                                });
+                            }
+                        });
+                    })
+                    .catch(function(error) {
+                        console.error(error);
+                        callback('Error saving message');
+                    });
+            } else {
+                console.error('user ' + userFrom + ' can not contact user ' + userTo);
+                callback('user ' + userFrom + ' can not contact user ' + userTo);
+            }
+
+        });
 };
 
 module.exports = ChatSocketManager;
