@@ -236,8 +236,8 @@ ChatSocketManager.prototype._send = function (userFrom, userTo, messageText, cal
                                             const data = {
                                                 slug: user_from.slug,
                                                 username: user_from.username,
-                                                photo: user_from.photo,
-                                                text: message.text
+                                                image: user_from.photo,
+                                                body: message.text
                                             };
                                             self.pushNotificationsManager.notify(userTo, category, data);
                                         });
