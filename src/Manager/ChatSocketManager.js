@@ -1,11 +1,11 @@
 var Promise = require('bluebird');
 
-var ChatSocketManager = function(io, database, userManager, notificationsSocketManager) {
+var ChatSocketManager = function(io, database, userManager, pushNotificationsManager) {
 
     var self = this;
     this.database = database;
     this.userManager = userManager;
-    this.notificationsSocketManager = notificationsSocketManager;
+    this.pushNotificationsManager = pushNotificationsManager;
     this.sockets = {};
     io
         .of('/chat')
@@ -239,7 +239,7 @@ ChatSocketManager.prototype._send = function (userFrom, userTo, messageText, cal
                                                 photo: user_from.photo,
                                                 text: message.text
                                             };
-                                            self.notificationsSocketManager.notify(userTo, category, data);
+                                            self.pushNotificationsManager.notify(userTo, category, data);
                                         });
                                 });
                             }

@@ -22,8 +22,8 @@ services:
     workersSocketManager:
         class    : /Manager/WorkersSocketManager
 
-    notificationsSocketManager:
-        class    : /Manager/NotificationsSocketManager
+    pushNotificationsManager:
+        class    : /Manager/PushNotificationsManager
 
     userManager:
         class    : /Manager/UserManager
