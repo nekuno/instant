@@ -1,3 +1,5 @@
+var request = require('request-promise');
+
 var PushNotificationsManager = function(database, params) {
     this.database = database;
     this.base_url = params.brain.base_url;
