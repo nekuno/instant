@@ -1,11 +1,11 @@
 var Promise = require('bluebird');
 
-var ChatSocketManager = function(io, database, userManager, notificationsSocketManager) {
+var ChatSocketManager = function(io, database, userManager, pushNotificationsManager) {
 
     var self = this;
     this.database = database;
     this.userManager = userManager;
-    this.notificationsSocketManager = notificationsSocketManager;
+    this.pushNotificationsManager = pushNotificationsManager;
     this.sockets = {};
     io
         .of('/chat')
@@ -226,22 +226,22 @@ ChatSocketManager.prototype._send = function (userFrom, userTo, messageText, cal
                             message.user_to = user_to;
 
                             if (self.sockets[userTo]) {
-                                self.sockets[userTo].forEach(function(socket) {
-                                    self.userManager
-                                        .find(userTo)
-                                        .then(function(user) {
+                                self.userManager
+                                    .find(userTo)
+                                    .then(function(user) {
+                                        self.sockets[userTo].forEach(function(socket) {
                                             message.user = user;
                                             socket.emit('messages', [message], true);
-                                            const category = 'message';
-                                            const data = {
-                                                slug: user_from.slug,
-                                                username: user_from.username,
-                                                photo: user_from.photo,
-                                                text: message.text
-                                            };
-                                            self.notificationsSocketManager.notify(userTo, category, data);
                                         });
-                                });
+                                        const category = 'message';
+                                        const data = {
+                                            slug: user_from.slug,
+                                            username: user_from.username,
+                                            image: user_from.photo.thumbnail.big,
+                                            body: message.text
+                                        };
+                                        self.pushNotificationsManager.notify(userTo, category, data);
+                                    });
                             }
 
                             if (self.sockets[userFrom]) {
