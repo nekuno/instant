@@ -107,4 +107,17 @@ UserManager.prototype.canContact = function(from, to) {
         });
 };
 
+UserManager.prototype.clearUser = function(userId) {
+    var self = this;
+
+    if (self.users[userId]) {
+        self.users[userId] = null;
+        return self.users[userId] = self.find(userId);
+    }
+
+    return new Promise(function(resolve) {
+        resolve(true);
+    });
+};
+
 module.exports = UserManager;
