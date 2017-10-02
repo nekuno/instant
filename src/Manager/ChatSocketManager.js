@@ -48,17 +48,17 @@ ChatSocketManager.prototype.add = function(socket) {
 
     var sendPaginated = function(messages, offset, limit) {
         var paginatedMessages = [];
+        var allMessages = [];
         var usersCount = 0;
 
         messages.forEach(function(message) {
-            var userExistsInMessages = paginatedMessages.some(function(paginatedMessage) {
-                return paginatedMessage.user_to === message.user_to && paginatedMessage.user_from === message.user_from ||
-                    paginatedMessage.user_to === message.user_from && paginatedMessage.user_from === message.user_to;
-            });
+            var userExistsInMessages = messageUserExistsInMessages(message, allMessages);
             if (!userExistsInMessages) {
                 usersCount++;
             }
-            if (offset < usersCount && limit > paginatedMessages.length || userExistsInMessages) {
+            allMessages.push(message);
+            var userExistsInPaginatedMessages = messageUserExistsInMessages(message, paginatedMessages);
+            if (offset < usersCount && (offset + limit >= usersCount) || userExistsInPaginatedMessages) {
                 paginatedMessages.push(message);
             }
         });
@@ -68,6 +68,13 @@ ChatSocketManager.prototype.add = function(socket) {
         } else {
             send(paginatedMessages.reverse(), false);
         }
+    };
+
+    var messageUserExistsInMessages = function(message, messages) {
+        return messages.some(function(singleMessage) {
+            return singleMessage.user_to === message.user_to && singleMessage.user_from === message.user_from ||
+                singleMessage.user_to === message.user_from && singleMessage.user_from === message.user_to;
+        });
     };
 
     var getThreadsMessages = function(offset, limit) {
