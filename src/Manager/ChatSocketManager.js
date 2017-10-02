@@ -46,76 +46,102 @@ ChatSocketManager.prototype.add = function(socket) {
         });
     };
 
-    // Users who can be contacted from userFrom
-    self.userManager
-        .findUsersCanContactFrom(userFrom)
-        .then(function(users) {
+    var sendPaginated = function(messages, offset, limit) {
+        var paginatedMessages = [];
+        var usersCount = 0;
 
-            users.forEach(function(user) {
-
-                if (self.sockets[user.id] && self.sockets[user.id].length > 0) {
-                    socket.emit('userStatus', user, 'online');
-                }
-
-                Message
-                    .query()
-                    .where(function() {
-                        this
-                            .where(function() {
-                                this
-                                    .where('user_from', userFrom)
-                                    .andWhere('user_to', user.id);
-                            })
-                            .orWhere(function() {
-                                this
-                                    .where('user_from', user.id)
-                                    .andWhere('user_to', userFrom);
-                            });
-                    })
-                    .orderBy('createdAt', 'DESC')
-                    .orderBy('id', 'DESC')
-                    .limit(10)
-                    .then(function(messages) {
-                        send(messages.reverse(), false);
-                    });
-
+        messages.forEach(function(message) {
+            var userExistsInMessages = paginatedMessages.some(function(paginatedMessage) {
+                return paginatedMessage.user_to === message.user_to && paginatedMessage.user_from === message.user_from ||
+                    paginatedMessage.user_to === message.user_from && paginatedMessage.user_from === message.user_to;
             });
-
-            Message
-                .query()
-                .count('id AS count')
-                .where(function() {
-                    this
-                        .where('user_from', userFrom)
-                        .orWhere('user_to', userFrom);
-                })
-                .orderBy('createdAt', 'DESC')
-                .then(function(count) {
-                    if (count[0].count === 0) {
-                        socket.emit('no-messages');
-                    }
-                });
+            if (!userExistsInMessages) {
+                usersCount++;
+            }
+            if (offset < usersCount && limit > paginatedMessages.length || userExistsInMessages) {
+                paginatedMessages.push(message);
+            }
         });
 
-    // Users that can contact to userFrom
-    self.userManager
-        .findUsersCanContactTo(userFrom)
-        .then(function(users) {
+        if (paginatedMessages.length === 0) {
+            socket.emit('no-messages');
+        } else {
+            send(paginatedMessages.reverse(), false);
+        }
+    };
 
-            users.forEach(function(otherUser) {
-
-                if (self.sockets[otherUser.id]) {
-                    self.sockets[otherUser.id].forEach(function(socket) {
+    var getThreadsMessages = function(offset, limit) {
+        // Users who can be contacted from userFrom
+        self.userManager
+            .findUsersCanContactFrom(userFrom)
+            .then(function(users) {
+                return Promise.all(users.map(function(user) {
+                    if (self.sockets[user.id] && self.sockets[user.id].length > 0) {
                         socket.emit('userStatus', user, 'online');
-                    });
-                }
+                    }
 
+                    return Message
+                        .query()
+                        .where(function() {
+                            this
+                                .where(function() {
+                                    this
+                                        .where('user_from', userFrom)
+                                        .andWhere('user_to', user.id);
+                                })
+                                .orWhere(function() {
+                                    this
+                                        .where('user_from', user.id)
+                                        .andWhere('user_to', userFrom);
+                                });
+                        })
+                        .orderBy('createdAt', 'DESC')
+                        .orderBy('id', 'DESC')
+                        .limit(10)
+                        .then(function(messages) {
+                           return messages;
+                        });
+                    }
+                ));
+            }).then(function(threads) {
+                threads = [].concat.apply([], threads);
+                threads = threads.sort(function(a, b) {
+                    if (a.createdAt < b.createdAt) {
+                        return 1;
+                    } else if (a.createdAt > b.createdAt) {
+                        return -1;
+                    }
+                    return 0;
+                });
+
+                sendPaginated(threads, offset, limit);
+            }
+        );
+
+        // Users that can contact to userFrom
+        self.userManager
+            .findUsersCanContactTo(userFrom)
+            .then(function(users) {
+                users.forEach(function(otherUser) {
+
+                    if (self.sockets[otherUser.id]) {
+                        self.sockets[otherUser.id].forEach(function(socket) {
+                            socket.emit('userStatus', user, 'online');
+                        });
+                    }
+
+                });
             });
-        });
 
-    self.sockets[userFrom] ? self.sockets[userFrom].push(socket) : self.sockets[userFrom] = [socket];
 
-    socket.emit('user', user);
+        self.sockets[userFrom] ? self.sockets[userFrom].push(socket) : self.sockets[userFrom] = [socket];
+
+        socket.emit('user', user);
+    };
+
+    socket.on('getThreadsMessages', function(offset, limit) {
+        getThreadsMessages(offset, limit);
+    });
 
     socket.on('sendMessage', function(userTo, messageText, callback) {
         self._send(userFrom, userTo, messageText, callback);
