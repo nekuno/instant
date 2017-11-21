@@ -26,6 +26,11 @@ var SocketAPI = function(app, workersSocketManager, chatSocketManager, userManag
         client_secret: params.oauthshim.spotify.client_secret,
         grant_url    : params.oauthshim.spotify.grant_url,
         domain       : 'http://client.local.nekuno.com/oauthcallback.html, https://client.local.nekuno.com/oauthcallback.html, http://m.pre.nekuno.com/oauthcallback.html, https://m.pre.nekuno.com/oauthcallback.html, http://m.nekuno.com/oauthcallback.html, https://m.nekuno.com/oauthcallback.html'
+    }, {
+        client_id    : params.oauthshim.tumblr.client_id,
+        client_secret: params.oauthshim.tumblr.client_secret,
+        grant_url    : params.oauthshim.tumblr.grant_url,
+        domain       : 'http://client.local.nekuno.com/oauthcallback.html, https://client.local.nekuno.com/oauthcallback.html, http://m.pre.nekuno.com/oauthcallback.html, https://m.pre.nekuno.com/oauthcallback.html, http://m.nekuno.com/oauthcallback.html, https://m.nekuno.com/oauthcallback.html'
     }]);
 
     var express = require('express');
