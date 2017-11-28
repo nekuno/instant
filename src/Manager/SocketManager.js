@@ -7,17 +7,13 @@ var SocketManager = function(io, database, userManager) {
     this.userManager = userManager;
 
     io
-        .of('/chat')
-        .authorization(function(handshakeData, accept) {
-
-            self._authorize(handshakeData, accept);
+        .of('/chat').use(function(socket, next) {
+            self._authorize(socket.handshake, next);
         });
 
     io
-        .of('/workers')
-        .authorization(function(handshakeData, accept) {
-
-            self._authorize(handshakeData, accept);
+        .of('/workers').use(function(socket, next) {
+            self._authorize(socket.handshake, next);
         });
 };
 
