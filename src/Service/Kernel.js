@@ -28,7 +28,7 @@ var Kernel = function(container) {
     }
     server.listen(params.server.port);
 
-    var io = require('socket.io').listen(server);
+    var io = require('socket.io')(server);
     io.set('log level', 1);
     container.add('io', io);
     container.add('app', app);

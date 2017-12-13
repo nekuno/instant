@@ -30,3 +30,11 @@ parameters:
             client_id: ~
             client_secret: ~
             grant_url: 'https://accounts.spotify.com/api/token'
+        tumblr:
+            client_id: boLPNHs4oCPLtisiAWFUijDIq6nJz0sl8DH0I6Scx7lxuofWxU
+            client_secret: 9JeA1Jr7SU3xbyr11Q9YNVLITAD5but4RGpqewF2vS9AmzuIsg
+            grant_url: 'https://www.tumblr.com/oauth/access_token'
+        linkedin:
+            client_id: ~
+            client_secret: ~
+            grant_url: 'https://www.linkedin.com/uas/oauth2/accessToken'
