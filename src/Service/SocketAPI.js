@@ -1,3 +1,5 @@
+var openid = require('openid');
+
 var SocketAPI = function(app, workersSocketManager, chatSocketManager, userManager, params) {
 
     app.get('/', function(req, res) {
@@ -37,6 +39,44 @@ var SocketAPI = function(app, workersSocketManager, chatSocketManager, userManag
         grant_url    : params.oauthshim.linkedin.grant_url,
         domain       : 'http://client.local.nekuno.com/oauthcallback.html, https://client.local.nekuno.com/oauthcallback.html, http://m.pre.nekuno.com/oauthcallback.html, https://m.pre.nekuno.com/oauthcallback.html, http://m.nekuno.com/oauthcallback.html, https://m.nekuno.com/oauthcallback.html'
     }]);
+
+    app.get('/openid/authenticate', function(req, res) {
+        var relyingParty = getRelyingParty(req);
+
+        relyingParty.authenticate('http://steamcommunity.com/openid', false, function(error, authUrl) {
+            if (error) {
+                res.writeHead(200);
+                res.end('Authentication failed: ' + error.message);
+            } else if (!authUrl) {
+                res.writeHead(200);
+                res.end('Authentication failed');
+            } else {
+                res.writeHead(302, { Location: authUrl });
+                res.end();
+            }
+        });
+    });
+
+    app.get('/openid/verify', function(req, res) {
+        var relyingParty = getRelyingParty(req);
+
+        relyingParty.verifyAssertion(req, function(error, result) {
+            var openid = result.claimedIdentifier.replace('http://steamcommunity.com/openid/id/', '');
+            res.writeHead(302, { Location: params.client.base_url + 'openidcallback.html?openid=' + openid });
+            res.end();
+        });
+    });
+
+    function getRelyingParty(request) {
+        var realm = request.protocol + '://' + request.get('host');
+        var verify = realm + '/openid/verify';
+        return new openid.RelyingParty(
+            verify,
+            realm,
+            true, // Use stateless verification
+            false, // Strict mode
+            []); // List of extensions to enable and include
+    }
 
     var express = require('express');
     var router = express.Router();

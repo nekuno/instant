@@ -12,6 +12,8 @@ parameters:
         password: nekuno
     brain:
         base_url: http://brain.local.nekuno.com/
+    client:
+        base_url: https://client.local.nekuno.com/
     api_secret: cliweodwfqpokfrfkcporfkpoqefrefqefbgw
     oauthshim:
         twitter:
