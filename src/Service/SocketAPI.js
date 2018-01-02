@@ -166,7 +166,7 @@ var SocketAPI = function(app, workersSocketManager, chatSocketManager, userManag
 
     router.delete('/user/messages', function(req, res) {
         var body = req.body;
-        chatSocketManager.message(body.userId);
+        chatSocketManager.deleteAllFromUser(body.userId);
         res.send();
     });
 
