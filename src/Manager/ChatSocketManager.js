@@ -19,6 +19,16 @@ ChatSocketManager.prototype.message = function(userFromId, userToId, text) {
     this._send(userFromId, userToId, text, function(a){});
 };
 
+ChatSocketManager.prototype.deleteAllFromUser = function(userId) {
+    var Message = this.database.model('Message');
+    Message
+        .query()
+        .where('user_from', userId)
+        .orWhere('user_to', userId)
+        .delete()
+        .then();
+};
+
 ChatSocketManager.prototype.add = function(socket) {
 
     var self = this;

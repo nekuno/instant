@@ -204,8 +204,13 @@ var SocketAPI = function(app, workersSocketManager, chatSocketManager, userManag
         res.send();
     });
 
-    app.use('/api', router);
+    router.delete('/user/messages', function(req, res) {
+        var body = req.body;
+        chatSocketManager.deleteAllFromUser(body.userId);
+        res.send();
+    });
 
+    app.use('/api', router);
 
 };
 
