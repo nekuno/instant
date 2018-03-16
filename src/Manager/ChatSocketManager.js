@@ -217,11 +217,13 @@ ChatSocketManager.prototype.add = function(socket) {
                 });
             });
 
-        self.sockets[userFrom].forEach(function(item, index) {
-            if (socket === item) {
-                self.sockets[userFrom].splice(index, 1);
-            }
-        });
+        if (self.sockets[userFrom]) {
+            self.sockets[userFrom].forEach(function(item, index) {
+                if (socket === item) {
+                    self.sockets[userFrom].splice(index, 1);
+                }
+            });
+        }
 
     });
 };
