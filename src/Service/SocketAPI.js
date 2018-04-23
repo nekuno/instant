@@ -43,7 +43,7 @@ var SocketAPI = function(app, workersSocketManager, chatSocketManager, userManag
     app.get('/openid/authenticate', function(req, res) {
         var relyingParty = getRelyingParty(req);
 
-        relyingParty.authenticate('http://steamcommunity.com/openid', false, function(error, authUrl) {
+        relyingParty.authenticate('https://steamcommunity.com/openid', false, function(error, authUrl) {
             if (error) {
                 res.writeHead(200);
                 res.end('Authentication failed: ' + error.message);
@@ -61,7 +61,7 @@ var SocketAPI = function(app, workersSocketManager, chatSocketManager, userManag
         var relyingParty = getRelyingParty(req);
 
         relyingParty.verifyAssertion(req, function(error, result) {
-            var openid = result.claimedIdentifier.replace('http://steamcommunity.com/openid/id/', '');
+            var openid = result.claimedIdentifier.replace('https://steamcommunity.com/openid/id/', '');
             res.writeHead(302, { Location: params.client.base_url + 'openidcallback.html?openid=' + openid });
             res.end();
         });
