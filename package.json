@@ -1,25 +1,25 @@
 {
   "name": "instant",
-  "version": "0.26.0",
+  "version": "1.0.0",
   "author": "Nekuno",
   "license": "AGPL-3.0",
   "dependencies": {
     "bluebird": "^2.9.34",
     "body-parser": "^1.12.2",
-    "bookshelf": "^0.7.9",
+    "bookshelf": "^0.13.3",
     "es6-shim": "^0.13.0",
     "express": "^4.12.3",
-    "fs-tools": "^0.2.11",
+    "fs-tools": "^0.3.0",
     "js-yaml": "^3.0.2",
-    "knex": "^0.7.3",
+    "knex": "^0.15.0",
     "mysql": "^2.3.2",
     "oauth-shim": "^1.1.1",
     "openid": "^2.0.6",
-    "request-promise": "^0.4.3",
+    "request-promise": "^4.2.2",
     "socket.io": "2.0.4"
   },
   "devDependencies": {
-    "gulp": "^3.8.5",
-    "gulp-jasmine": "^0.2.0"
+    "gulp": "^4.0",
+    "gulp-jasmine": "^4.0"
   }
 }
