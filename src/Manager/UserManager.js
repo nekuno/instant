@@ -6,6 +6,14 @@ var UserManager = function(database, params) {
     this.database = database;
     this.users = {};
     this.base_url = params.brain.base_url;
+    this.http_username = params.brain.http_username;
+    this.http_password = params.brain.http_password;
+};
+
+var getAuthHeaders = function(http_username, http_password) {
+    return {
+        Authorization: 'Basic ' + Buffer.from(http_username + ':' + http_password).toString('base64')
+    };
 };
 
 UserManager.prototype.find = function(id) {
@@ -18,7 +26,7 @@ UserManager.prototype.find = function(id) {
         });
     }
 
-    return request({uri: this.base_url + 'instant/users/' + id, json: true})
+    return request({uri: this.base_url + 'instant/users/' + id, json: true, headers: getAuthHeaders(this.http_username, this.http_password)})
         .then(function(user) {
             user = self._toObject(user);
             self.users[id] = user;
@@ -63,7 +71,7 @@ UserManager.prototype.findUsersCanContactFrom = function(id) {
 
     var self = this;
 
-    return request({uri: this.base_url + 'instant/users/' + id + '/contact/from', json: true})
+    return request({uri: this.base_url + 'instant/users/' + id + '/contact/from', json: true, headers: getAuthHeaders(this.http_username, this.http_password)})
         .then(function(users) {
             var all = [];
             users.forEach(function(user) {
@@ -80,7 +88,7 @@ UserManager.prototype.findUsersCanContactTo = function(id) {
 
     var self = this;
 
-    return request({uri: this.base_url + 'instant/users/' + id + '/contact/to', json: true})
+    return request({uri: this.base_url + 'instant/users/' + id + '/contact/to', json: true, headers: getAuthHeaders(this.http_username, this.http_password)})
         .then(function(users) {
             var all = [];
             users.forEach(function(user) {
@@ -95,7 +103,7 @@ UserManager.prototype.findUsersCanContactTo = function(id) {
 
 UserManager.prototype.canContact = function(from, to) {
 
-    return request({uri: this.base_url + 'instant/users/' + from + '/contact/' + to, json: true})
+    return request({uri: this.base_url + 'instant/users/' + from + '/contact/' + to, json: true, headers: getAuthHeaders(this.http_username, this.http_password)})
         .then(function() {
             return true;
         })

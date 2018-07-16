@@ -12,6 +12,8 @@ parameters:
         password: nekuno
     brain:
         base_url: http://brain.local.nekuno.com/
+        http_username: instant
+        http_password: nekuno
     client:
         base_url: https://client.local.nekuno.com/
     api_secret: cliweodwfqpokfrfkcporfkpoqefrefqefbgw

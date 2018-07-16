@@ -3,6 +3,8 @@ var request = require('request-promise');
 var PushNotificationsManager = function(database, params) {
     this.database = database;
     this.base_url = params.brain.base_url;
+    this.http_username = params.brain.http_username;
+    this.http_password = params.brain.http_password;
 };
 
 PushNotificationsManager.prototype.notify = function(userId, category, data) {
@@ -15,7 +17,10 @@ PushNotificationsManager.prototype.notify = function(userId, category, data) {
             category: category,
             data: data
         },
-        json: true
+        json: true,
+        headers: {
+            Authorization: 'Basic ' + Buffer.from(this.http_username + ':' + this.http_password).toString('base64')
+        }
     };
 
     return request(options)
