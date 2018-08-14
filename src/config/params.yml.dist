@@ -10,6 +10,7 @@ parameters:
         database: nekuno
         user    : nekuno
         password: nekuno
+    encryption_password: okuytfkuyfkygluhglhljyjwcqceuywv
     brain:
         base_url: http://brain.local.nekuno.com/
         http_username: instant

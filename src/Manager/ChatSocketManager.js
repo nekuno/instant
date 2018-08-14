@@ -1,9 +1,10 @@
 var Promise = require('bluebird');
 
-var ChatSocketManager = function(io, database, userManager, pushNotificationsManager) {
+var ChatSocketManager = function(io, database, encryption, userManager, pushNotificationsManager) {
 
     var self = this;
     this.database = database;
+    this.encryption = encryption;
     this.userManager = userManager;
     this.pushNotificationsManager = pushNotificationsManager;
     this.sockets = {};
@@ -43,7 +44,7 @@ ChatSocketManager.prototype.add = function(socket) {
         messages.forEach(function(message) {
 
             message.user = user;
-
+            message.text = self.encryption.decrypt(message.text);
             all.push(Promise.join(self.userManager.find(message.user_from), self.userManager.find(message.user_to), function(user_from, user_to) {
                 message.user_from = user_from;
                 message.user_to = user_to;
@@ -256,7 +257,7 @@ ChatSocketManager.prototype._send = function (userFrom, userTo, messageText, cal
                     .forge({
                         user_from: userFrom,
                         user_to  : userTo,
-                        text     : messageText,
+                        text     : message.text = self.encryption.encrypt(messageText),
                         readed   : 0,
                         createdAt: timestamp
                     })
@@ -264,6 +265,7 @@ ChatSocketManager.prototype._send = function (userFrom, userTo, messageText, cal
                     .then(function(message) {
 
                         message = message.toJSON();
+                        message.text = self.encryption.decrypt(message.text);
 
                         Promise.join(self.userManager.find(message.user_from), self.userManager.find(message.user_to), function(user_from, user_to) {
 

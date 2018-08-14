@@ -7,6 +7,7 @@
     "bluebird": "^2.9.34",
     "body-parser": "^1.12.2",
     "bookshelf": "^0.13.3",
+    "commander": "^2.17.1",
     "es6-shim": "^0.13.0",
     "express": "^4.12.3",
     "fs-tools": "^0.3.0",
