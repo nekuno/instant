@@ -114,7 +114,7 @@ ChatSocketManager.prototype.add = function(socket) {
                         })
                         .orderBy('createdAt', 'DESC')
                         .orderBy('id', 'DESC')
-                        .limit(10)
+                        .limit(20)
                         .then(function(messages) {
                            return messages;
                         });
@@ -184,7 +184,7 @@ ChatSocketManager.prototype.add = function(socket) {
             .orderBy('createdAt', 'DESC')
             .orderBy('id', 'DESC')
             .offset(offset)
-            .limit(10)
+            .limit(20)
             .then(function(messages) {
                 messages.length == 0 ? callback() : send(messages, false);
             });
